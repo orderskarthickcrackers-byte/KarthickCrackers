@@ -37,7 +37,7 @@ BEGIN
         [CategoryId] INT NOT NULL,
         [Price] DECIMAL(18,2) NOT NULL,
         [MRPPrice] DECIMAL(18,2) NULL,
-        [DiscountPercentage] INT NOT NULL DEFAULT 0,
+        [DiscountPercentage] DECIMAL(18,2) NOT NULL DEFAULT 0,
         [DiscountPrice] DECIMAL(18,2) NOT NULL DEFAULT 0,
         [Unit] NVARCHAR(50) NOT NULL,
         [TotalQuantity] INT NOT NULL DEFAULT 100,

@@ -120,6 +120,18 @@ namespace KarthickCrackers.Api.Data
                     EXEC('UPDATE [Products] SET [MRPPrice] = [Price], [DiscountPrice] = [Price], [TotalQuantity] = 50 WHERE [MRPPrice] = 0');
                 END
 
+                -- Ensure DiscountPercentage column in Products table is decimal(18,2) if it was created as INT
+                IF EXISTS (
+                    SELECT * FROM sys.columns c
+                    JOIN sys.types t ON c.user_type_id = t.user_type_id
+                    WHERE c.object_id = OBJECT_ID('Products') 
+                      AND c.name = 'DiscountPercentage' 
+                      AND t.name IN ('int', 'bigint', 'smallint', 'tinyint')
+                )
+                BEGIN
+                    ALTER TABLE [Products] ALTER COLUMN [DiscountPercentage] decimal(18,2) NOT NULL;
+                END
+
                 -- Automatically clean up any existing KC- or KHC- product code prefixes in the database
                 EXEC('UPDATE [Products] SET [ProductCode] = REPLACE(REPLACE(REPLACE([ProductCode], ''KC-'', ''''), ''KHC-'', ''''), ''KC'', '''') WHERE [ProductCode] LIKE ''%KC%'' OR [ProductCode] LIKE ''%KHC%''');
                 EXEC('UPDATE [OrderItems] SET [ProductCode] = REPLACE(REPLACE(REPLACE([ProductCode], ''KC-'', ''''), ''KHC-'', ''''), ''KC'', '''') WHERE [ProductCode] LIKE ''%KC%'' OR [ProductCode] LIKE ''%KHC%''');
