@@ -123,6 +123,15 @@ namespace KarthickCrackers.Api.Services
 
         private async Task<string> GetBrowserExecutablePathAsync()
         {
+            // Check Environment Variable
+            string? envPath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH");
+            if (!string.IsNullOrEmpty(envPath) && File.Exists(envPath)) return envPath;
+
+            // Check installed Linux Chromium / Chrome
+            if (File.Exists("/usr/bin/chromium")) return "/usr/bin/chromium";
+            if (File.Exists("/usr/bin/chromium-browser")) return "/usr/bin/chromium-browser";
+            if (File.Exists("/usr/bin/google-chrome")) return "/usr/bin/google-chrome";
+
             // Check installed Windows Edge
             string edgePath = @"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe";
             if (File.Exists(edgePath)) return edgePath;

@@ -285,7 +285,7 @@ export class ProductService {
     this.downloadPriceListPdfApi(categoryId).subscribe({
       next: (blob: Blob) => {
         if (blob.size === 0) {
-          window.print();
+          alert('Failed to download PDF: Received empty file from server.');
           return;
         }
         const url = window.URL.createObjectURL(blob);
@@ -298,8 +298,8 @@ export class ProductService {
         window.URL.revokeObjectURL(url);
       },
       error: (err) => {
-        console.warn('Server PDF service offline or container restricted, falling back to browser print/PDF generator:', err);
-        window.print();
+        console.error('Error downloading server PDF:', err);
+        alert('An error occurred while generating/downloading the PDF price list from the server. Please try again.');
       }
     });
   }
