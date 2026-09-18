@@ -1,0 +1,81 @@
+<div class="wrap">
+  <nav class="crumb"><a routerLink="/home">Home</a><span class="sep">/</span><span class="cur">Your cart</span></nav>
+  <div class="page-head">
+    <h1>Your cart</h1>
+    <p class="count">{{ cartService.cartCount() }} {{ cartService.cartCount() === 1 ? 'item' : 'items' }}</p>
+  </div>
+
+  @if (cartService.cartItems().length > 0 && !cartService.isMinimumOrderMet()) {
+    <div class="admin-error-banner" style="margin-bottom: 24px; background: rgba(245, 194, 66, 0.12); border-color: var(--mustard); color: var(--mustard-2); display: flex; align-items: center; justify-content: space-between;">
+      <div>
+        <strong style="font-size: 15px;">⚠️ Minimum Order Threshold Required:</strong>
+        <p style="margin-top: 4px; font-size: 13.5px; color: var(--text);">Minimum order amount is <strong>₹2,500.00</strong>. Please add <strong>{{ formatPrice(cartService.minOrderShortfall()) }}</strong> more to proceed to checkout.</p>
+      </div>
+      <a routerLink="/listing" class="btn btn-primary btn-sm" style="white-space: nowrap; margin-left: 16px;">Add More Items</a>
+    </div>
+  }
+
+  <div class="cart-layout">
+    <div>
+      @if (cartService.cartItems().length === 0) {
+        <div class="cart-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="21" r="1.4"/><circle cx="18" cy="21" r="1.4"/><path d="M2.5 3h2.4l2.6 12.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7.2H6.2"/></svg>
+          <p>Your cart is empty. Browse the catalogue to add your first item.</p>
+          <a routerLink="/listing" class="btn btn-primary">Shop all fireworks</a>
+        </div>
+      } @else {
+        <div class="cart-list">
+          @for (item of cartService.cartItems(); track item.code) {
+            @let p = getProduct(item.code);
+            @if (p) {
+              <div class="cart-row">
+                <div class="cart-thumb">
+                  <img [src]="p.image" [alt]="p.name">
+                </div>
+                <div>
+                  <div class="cart-name">{{ p.name }}</div>
+                  <div class="cart-meta">{{ p.code }}</div>
+                  <div class="cart-unit-price">{{ formatPrice(p.price) }} · {{ p.unit }}</div>
+                </div>
+                <div class="cart-qty-cell">
+                  <div class="qty-stepper">
+                    <button (click)="onDecreaseQty(p.code, item.qty)" aria-label="Decrease quantity">−</button>
+                    <span>{{ item.qty }}</span>
+                    <button (click)="onIncreaseQty(p.code, item.qty)" aria-label="Increase quantity">+</button>
+                  </div>
+                </div>
+                <div class="cart-line-total">{{ formatPrice(p.price * item.qty) }}</div>
+                <button class="cart-remove" (click)="onRemove(p.code)" [attr.aria-label]="'Remove ' + p.name">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </button>
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+
+    <div class="summary-card">
+      <h4>Order summary</h4>
+      <div class="summary-row"><span>Subtotal</span><span>{{ formatPrice(cartService.cartSubtotal()) }}</span></div>
+      <div class="summary-row"><span>Minimum Order</span><span>₹2,500.00</span></div>
+      <div class="summary-row"><span>Transport / Shipping</span><span>Based on availability</span></div>
+      <div class="summary-row total"><span>Total</span><b>{{ formatPrice(cartService.cartTotal()) }}</b></div>
+
+      @if (cartService.isMinimumOrderMet()) {
+        <a routerLink="/checkout" class="btn btn-primary btn-block" style="margin-top:18px;">Proceed to checkout</a>
+      } @else {
+        <button class="btn btn-primary btn-block" disabled style="margin-top:18px; opacity:0.65; cursor:not-allowed;">
+          Min Order ₹2,500 Required
+        </button>
+        <p style="font-size:12px; color:var(--mustard-2); text-align:center; margin-top:8px;">Add {{ formatPrice(cartService.minOrderShortfall()) }} more to checkout</p>
+      }
+
+      <a routerLink="/listing" class="continue-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        Continue shopping
+      </a>
+      <p class="summary-note">Prices include GST. Transport & dispatch will be discussed with you directly based on transport availability to your destination.</p>
+    </div>
+  </div>
+</div>

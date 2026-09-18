@@ -1,0 +1,31 @@
+<header class="site-header">
+  <div class="wrap">
+    <div class="header-inner">
+      <a routerLink="/home" class="brand" aria-label="Karthick Crackers, go to home">
+        <img src="assets/images/karthick-crackers-logo.jpg" alt="Karthick Crackers Logo" class="brand-mark">
+        <div class="brand-word">
+          <b>Karthick Crackers</b>
+          <span>SIVAKASI · SINCE 2010</span>
+        </div>
+      </a>
+
+      <nav class="main-nav" aria-label="Primary">
+        <a routerLink="/home" routerLinkActive="is-current" [routerLinkActiveOptions]="{exact: true}" class="nav-link">Home</a>
+        <a routerLink="/quick-order" routerLinkActive="is-current" class="nav-link" style="color: var(--mustard-2); font-weight: 700;">⚡ Quick order</a>
+        <a routerLink="/listing" routerLinkActive="is-current" class="nav-link">Shop all</a>
+        <a routerLink="/category/all" routerLinkActive="is-current" class="nav-link">Categories</a>
+      </nav>
+
+      <div class="header-actions">
+        <a [href]="'https://wa.me/' + paymentSettingsService.cleanPhoneSignal()" target="_blank" class="btn btn-whatsapp btn-sm">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.36 2 11.74c0 2.07.62 3.99 1.68 5.6L2 22l4.85-1.55A10.1 10.1 0 0 0 12 21.48c5.52 0 10-4.36 10-9.74S17.52 2 12 2Zm0 17.7c-1.65 0-3.2-.46-4.52-1.26l-.32-.19-3.1.99.97-3.05-.2-.32a7.86 7.86 0 0 1-1.24-4.13c0-4.4 3.72-7.98 8.41-7.98s8.41 3.58 8.41 7.98-3.72 7.96-8.41 7.96Zm4.53-5.87c-.25-.13-1.47-.73-1.7-.81-.23-.08-.4-.13-.56.13-.17.25-.65.81-.79.98-.15.17-.29.19-.54.06-.25-.13-1.06-.4-2.02-1.26-.75-.68-1.25-1.51-1.4-1.77-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.12-.15.16-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.37-.77-1.87-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.87.86-.87 2.11s.9 2.45 1.02 2.62c.13.17 1.77 2.77 4.29 3.78.6.26 1.07.42 1.43.53.6.19 1.15.17 1.58.1.48-.07 1.47-.6 1.68-1.19.21-.58.21-1.08.15-1.19-.06-.11-.23-.17-.48-.3Z"/></svg>
+          <span>WhatsApp</span>
+        </a>
+        <a routerLink="/cart" class="icon-btn" aria-label="View cart">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1.4"/><circle cx="18" cy="21" r="1.4"/><path d="M2.5 3h2.4l2.6 12.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L21 7.2H6.2"/></svg>
+          <span class="cart-count">{{ cartService.cartCount() }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 480" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradients -->
+    <linearGradient id="bannerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090806"/>
+      <stop offset="35%" stop-color="#16120C"/>
+      <stop offset="70%" stop-color="#241C10"/>
+      <stop offset="100%" stop-color="#0E0C0A"/>
+    </linearGradient>
+    
+    <radialGradient id="goldSunburst" cx="75%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#FFF5CC" stop-opacity="0.9"/>
+      <stop offset="25%" stop-color="#F5C242" stop-opacity="0.7"/>
+      <stop offset="60%" stop-color="#E5A93C" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#090806" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="leftGlow" cx="20%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F5C242" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#090806" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Metallic Gold Text & Badge Gradients -->
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFEAA5"/>
+      <stop offset="30%" stop-color="#F5C242"/>
+      <stop offset="70%" stop-color="#E5A93C"/>
+      <stop offset="100%" stop-color="#FFD700"/>
+    </linearGradient>
+
+    <linearGradient id="redDiscount" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D32F2F"/>
+      <stop offset="100%" stop-color="#8B0000"/>
+    </linearGradient>
+
+    <linearGradient id="badgeGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5C242"/>
+      <stop offset="50%" stop-color="#E5A93C"/>
+      <stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base Canvas Background -->
+  <rect width="1600" height="480" fill="url(#bannerBg)"/>
+  
+  <!-- Glowing Sunburst Background Layer -->
+  <rect width="1600" height="480" fill="url(#goldSunburst)"/>
+  <rect width="1600" height="480" fill="url(#leftGlow)"/>
+
+  <!-- Sunburst Rays -->
+  <g stroke="#F5C242" stroke-width="1.2" opacity="0.12">
+    <line x1="1200" y1="200" x2="800" y2="-100"/>
+    <line x1="1200" y1="200" x2="1000" y2="-100"/>
+    <line x1="1200" y1="200" x2="1200" y2="-100"/>
+    <line x1="1200" y1="200" x2="1400" y2="-100"/>
+    <line x1="1200" y1="200" x2="1600" y2="-100"/>
+    <line x1="1200" y1="200" x2="1700" y2="100"/>
+    <line x1="1200" y1="200" x2="1700" y2="300"/>
+    <line x1="1200" y1="200" x2="1700" y2="500"/>
+    <line x1="1200" y1="200" x2="1400" y2="600"/>
+    <line x1="1200" y1="200" x2="1100" y2="600"/>
+    <line x1="1200" y1="200" x2="800" y2="500"/>
+    <line x1="1200" y1="200" x2="700" y2="300"/>
+    <line x1="1200" y1="200" x2="700" y2="100"/>
+  </g>
+
+  <!-- Decorative Border Frame -->
+  <rect x="15" y="15" width="1570" height="450" rx="14" fill="none" stroke="url(#goldText)" stroke-width="2" opacity="0.6"/>
+  <rect x="23" y="23" width="1554" height="434" rx="10" fill="none" stroke="#F5C242" stroke-width="1" opacity="0.3"/>
+
+  <!-- Golden Sparkle Firework Burst Graphics Over Right Side -->
+  <g opacity="0.8">
+    <!-- Star explosion 1 -->
+    <circle cx="1150" cy="90" r="4" fill="#FFF"/>
+    <path d="M 1150 40 L 1150 140 M 1100 90 L 1200 90 M 1115 55 L 1185 125 M 1185 55 L 1115 125" stroke="#F5C242" stroke-width="2" stroke-linecap="round"/>
+    <!-- Star explosion 2 -->
+    <circle cx="1450" cy="140" r="3" fill="#FFF"/>
+    <path d="M 1450 100 L 1450 180 M 1410 140 L 1490 140 M 1422 112 L 1478 168 M 1478 112 L 1422 168" stroke="#FFEAA5" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+
+  <!-- Left Side: Brand Header & Offer Text -->
+  <!-- Logo Mark -->
+  <g transform="translate(60, 45)">
+    <circle cx="40" cy="40" r="38" fill="#14120E" stroke="url(#goldText)" stroke-width="3"/>
+    <circle cx="40" cy="40" r="30" fill="none" stroke="#F5C242" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <path d="M40 12v16M40 52v16M12 40h16M52 40h16M20 20l12 12M48 48l12 12M60 20l-12 12M32 48l-12 12" stroke="#F5C242" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="40" cy="40" r="8" fill="#FFF"/>
+  </g>
+
+  <!-- Title: KARTHICK CRACKERS -->
+  <text x="160" y="85" font-family="'Big Shoulders Display', 'Sora', sans-serif" font-weight="900" font-size="64" fill="url(#goldText)" letter-spacing="2">KARTHICK CRACKERS</text>
+  <text x="162" y="115" font-family="'Sora', sans-serif" font-weight="700" font-size="20" fill="#F4F1EA" letter-spacing="4">SIVAKASI · SINCE 2010 — YOUR CELEBRATION PARTNER</text>
+  <line x1="162" y1="130" x2="780" y2="130" stroke="#F5C242" stroke-width="2" opacity="0.6"/>
+
+  <!-- Badges Row -->
+  <g transform="translate(162, 150)">
+    <!-- Badge 1 -->
+    <rect x="0" y="0" width="180" height="42" rx="21" fill="#191611" stroke="#F5C242" stroke-width="1.5"/>
+    <circle cx="24" cy="21" r="12" fill="#F5C242"/>
+    <path d="M 18 21 L 22 25 L 30 17" stroke="#090806" stroke-width="3" fill="none"/>
+    <text x="46" y="26" font-family="'Sora', sans-serif" font-weight="700" font-size="13" fill="#F4F1EA">PREMIUM QUALITY</text>
+
+    <!-- Badge 2 -->
+    <rect x="195" y="0" width="180" height="42" rx="21" fill="#191611" stroke="#F5C242" stroke-width="1.5"/>
+    <circle cx="219" cy="21" r="12" fill="#F5C242"/>
+    <path d="M 213 21 L 217 25 L 225 17" stroke="#090806" stroke-width="3" fill="none"/>
+    <text x="241" y="26" font-family="'Sora', sans-serif" font-weight="700" font-size="13" fill="#F4F1EA">SAFE &amp; RELIABLE</text>
+
+    <!-- Badge 3 -->
+    <rect x="390" y="0" width="180" height="42" rx="21" fill="#191611" stroke="#F5C242" stroke-width="1.5"/>
+    <circle cx="414" cy="21" r="12" fill="#F5C242"/>
+    <path d="M 408 21 L 412 25 L 420 17" stroke="#090806" stroke-width="3" fill="none"/>
+    <text x="436" y="26" font-family="'Sora', sans-serif" font-weight="700" font-size="13" fill="#F4F1EA">FACTORY DIRECT</text>
+  </g>
+
+  <!-- Cracker Products Display Line-up on Right Center -->
+  <g transform="translate(820, 210)">
+    <!-- Sparklers Box -->
+    <g transform="translate(0, 40)">
+      <rect x="0" y="0" width="60" height="150" rx="4" fill="#2A2215" stroke="#F5C242" stroke-width="1.5"/>
+      <text x="30" y="80" font-family="sans-serif" font-weight="800" font-size="10" fill="#F5C242" text-anchor="middle" transform="rotate(-90 30 80)">SPARKLERS</text>
+    </g>
+
+    <!-- Flower Pot Cone -->
+    <g transform="translate(80, 50)">
+      <polygon points="10,140 70,140 50,40 30,40" fill="#E5A93C" stroke="#FFF" stroke-width="1.5"/>
+      <ellipse cx="40" cy="40" rx="10" ry="3" fill="#191611"/>
+    </g>
+
+    <!-- Thunder King Aerial Box -->
+    <g transform="translate(170, 20)">
+      <rect x="0" y="0" width="130" height="170" rx="6" fill="#191611" stroke="#F5C242" stroke-width="2"/>
+      <rect x="8" y="8" width="114" height="154" rx="4" fill="#8B0000" stroke="#E5A93C" stroke-width="1"/>
+      <text x="65" y="70" font-family="'Big Shoulders Display', sans-serif" font-weight="900" font-size="18" fill="#FFF" text-anchor="middle">THUNDER KING</text>
+      <text x="65" y="90" font-family="sans-serif" font-weight="800" font-size="12" fill="#F5C242" text-anchor="middle">10 SHOTS AERIAL</text>
+      <circle cx="45" cy="120" r="10" fill="#F5C242"/>
+      <circle cx="65" cy="120" r="10" fill="#F5C242"/>
+      <circle cx="85" cy="120" r="10" fill="#F5C242"/>
+    </g>
+
+    <!-- Sky Rocket -->
+    <g transform="translate(320, -10)">
+      <polygon points="15,0 30,35 0,35" fill="#F5C242"/>
+      <rect x="4" y="35" width="22" height="90" fill="#D32F2F" stroke="#F5C242" stroke-width="1.5"/>
+      <line x1="15" y1="125" x2="15" y2="210" stroke="#FFF" stroke-width="3"/>
+    </g>
+
+    <!-- Bijili 1000 Wala Red Roll -->
+    <g transform="translate(370, 60)">
+      <rect x="0" y="0" width="75" height="130" rx="4" fill="#B71C1C" stroke="#F5C242" stroke-width="1.5"/>
+      <text x="37" y="70" font-family="sans-serif" font-weight="900" font-size="12" fill="#FFF" text-anchor="middle" transform="rotate(-90 37 70)">1000 WALA</text>
+    </g>
+  </g>
+
+  <!-- Big Discount Splash Badge (Top Right) -->
+  <g transform="translate(860, 40)">
+    <!-- Red Ribbon Banner -->
+    <path d="M 0 35 L 260 0 L 290 85 L 30 120 Z" fill="url(#redDiscount)" stroke="#F5C242" stroke-width="2.5" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.8))"/>
+    
+    <text x="140" y="48" font-family="'Big Shoulders Display', sans-serif" font-weight="900" font-size="34" fill="#FFF" text-anchor="middle">UPTO</text>
+    <text x="145" y="105" font-family="'Big Shoulders Display', sans-serif" font-weight="900" font-size="76" fill="#F5C242" text-anchor="middle" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.9))">55% OFF</text>
+    
+    <rect x="-10" y="115" width="310" height="34" rx="6" fill="#F5C242" stroke="#FFF" stroke-width="1.5"/>
+    <text x="145" y="138" font-family="'Sora', sans-serif" font-weight="900" font-size="16" fill="#090806" text-anchor="middle" letter-spacing="1">BIGGEST DIWALI SALE 2026!</text>
+  </g>
+
+  <!-- Circular Round Badge (Top Far Right) -->
+  <g transform="translate(1420, 60)">
+    <circle cx="65" cy="65" r="58" fill="#191611" stroke="url(#goldText)" stroke-width="3"/>
+    <circle cx="65" cy="65" r="50" fill="#8B0000" stroke="#F5C242" stroke-width="1.5" stroke-dasharray="4 3"/>
+    <text x="65" y="48" font-family="'Sora', sans-serif" font-weight="800" font-size="11" fill="#FFF" text-anchor="middle">CELEBRATE</text>
+    <text x="65" y="68" font-family="'Big Shoulders Display', sans-serif" font-weight="900" font-size="24" fill="#F5C242" text-anchor="middle">SAFE</text>
+    <text x="65" y="86" font-family="'Sora', sans-serif" font-weight="800" font-size="11" fill="#FFF" text-anchor="middle">CELEBRATE HAPPY</text>
+  </g>
+
+  <!-- Bottom Info Footer Banner Bar -->
+  <g transform="translate(60, 395)">
+    <rect x="0" y="0" width="1480" height="52" rx="10" fill="#14110C" stroke="#F5C242" stroke-width="1.5"/>
+    
+    <!-- Location -->
+    <g transform="translate(25, 16)">
+      <circle cx="10" cy="10" r="14" fill="#E5A93C"/>
+      <path d="M10 4 C6.5 4 4 6.5 4 10 C4 14.5 10 18 10 18 C10 18 16 14.5 16 10 C16 6.5 13.5 4 10 4 Z" fill="#090806"/>
+      <text x="32" y="15" font-family="'Sora', sans-serif" font-weight="700" font-size="13" fill="#F4F1EA">3/347/U, Inthira Group House, Maraneri Village, Sivakasi - 626124</text>
+    </g>
+
+    <!-- Phone / WhatsApp -->
+    <g transform="translate(580, 16)">
+      <circle cx="10" cy="10" r="14" fill="#25D366"/>
+      <path d="M10 4 C6.7 4 4 6.7 4 10 C4 11.2 4.3 12.3 4.9 13.2 L4 16 L6.9 15.1 C7.8 15.6 8.9 16 10 16 C13.3 16 16 13.3 16 10 C16 6.7 13.3 4 10 4 Z" fill="#FFF"/>
+      <text x="32" y="15" font-family="'Sora', sans-serif" font-weight="800" font-size="14" fill="#F5C242">+91 98765 43210</text>
+    </g>
+
+    <!-- Website / Email -->
+    <g transform="translate(1020, 16)">
+      <circle cx="10" cy="10" r="14" fill="#E5A93C"/>
+      <path d="M4 6 H16 V14 H4 Z" fill="none" stroke="#090806" stroke-width="2"/>
+      <path d="M4 6 L10 10 L16 6" fill="none" stroke="#090806" stroke-width="2"/>
+      <text x="32" y="15" font-family="'Sora', sans-serif" font-weight="700" font-size="13" fill="#F4F1EA">orders.karthick.crackers@gmail.com</text>
+    </g>
+  </g>
+</svg>

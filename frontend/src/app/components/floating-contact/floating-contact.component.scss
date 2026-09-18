@@ -1,0 +1,88 @@
+.floating-contact-widget {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  pointer-events: none;
+}
+
+.float-icon-btn {
+  pointer-events: auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-decoration: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.25s cubic-bezier(0.22, 0.9, 0.3, 1);
+  position: relative;
+
+  &:hover {
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+  }
+}
+
+.float-whatsapp {
+  background: linear-gradient(135deg, #25D366, #128C7E);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  .pulse-ring {
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 2px solid #25D366;
+    animation: waPulse 2s cubic-bezier(0.22, 0.9, 0.3, 1) infinite;
+    pointer-events: none;
+  }
+}
+
+.float-call {
+  background: linear-gradient(135deg, #F5C242, #E5A93C);
+  color: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+
+  svg {
+    stroke: #000000;
+  }
+}
+
+@keyframes waPulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .floating-contact-widget {
+    bottom: 78px;
+    left: 14px;
+    gap: 10px;
+  }
+
+  .float-icon-btn {
+    width: 46px;
+    height: 46px;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+}

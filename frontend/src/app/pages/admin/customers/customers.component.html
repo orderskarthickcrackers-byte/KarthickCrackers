@@ -1,0 +1,377 @@
+<div class="admin-page-wrapper">
+  <app-admin-sidebar></app-admin-sidebar>
+
+  <main class="admin-main-content">
+    <header class="admin-topbar">
+      <div>
+        <h1 class="admin-page-title">Customer Directory</h1>
+        <p class="admin-page-subtitle">Manage customer profiles, contact info, and lifetime purchase history</p>
+      </div>
+
+      <div class="admin-topbar-actions">
+        <button (click)="loadCustomers()" class="btn btn-ghost btn-sm" [disabled]="isLoading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Search & Pagination Controls Bar -->
+    <div class="admin-section-card" style="margin-bottom: 24px; padding: 18px 24px;">
+      <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+        <div style="display: flex; gap: 12px; flex: 1; min-width: 280px; align-items: center;">
+          <div style="position: relative; width: 100%; max-width: 420px;">
+            <input 
+              type="text" 
+              class="admin-input" 
+              placeholder="Search by customer name, mobile, or city..." 
+              [(ngModel)]="searchQuery" 
+              (ngModelChange)="onSearchChange()"
+              style="padding-left: 36px; width: 100%;"
+            >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-dim);">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 13px; color: var(--text-dim);">Rows per page:</span>
+          <select class="admin-input" style="width: 80px;" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+            <option [value]="10">10</option>
+            <option [value]="25">25</option>
+            <option [value]="50">50</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    @if (errorMessage) {
+      <div class="admin-error-banner">
+        <div class="error-text">{{ errorMessage }}</div>
+        <button (click)="loadCustomers()" class="btn btn-primary btn-sm">Try Again</button>
+      </div>
+    } @else if (isLoading) {
+      <div class="admin-loading-state">
+        <div class="spinner"></div>
+        <p>Loading customers directory...</p>
+      </div>
+    } @else {
+      <!-- Customer Table -->
+      <section class="admin-section-card">
+        @if (customers && customers.length > 0) {
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Customer Name</th>
+                  <th>Mobile Number</th>
+                  <th>City / Pincode</th>
+                  <th>Total Orders</th>
+                  <th>Total Spent</th>
+                  <th>Remarks</th>
+                  <th>Registered</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (cust of customers; track cust.customerId) {
+                  <tr>
+                    <td>
+                      <div class="font-bold text-white">{{ cust.fullName }}</div>
+                      @if (cust.email) {
+                        <div style="font-size: 12px; color: var(--text-dim);">{{ cust.email }}</div>
+                      }
+                    </td>
+                    <td class="font-mono text-gold font-bold">{{ cust.mobileNumber }}</td>
+                    <td class="text-dim">
+                      {{ cust.city || 'N/A' }} {{ cust.pincode ? ('- ' + cust.pincode) : '' }}
+                    </td>
+                    <td>
+                      <span class="qty-badge qty-ok">{{ cust.totalOrders }} Orders</span>
+                    </td>
+                    <td class="font-mono font-bold text-mustard">
+                      {{ formatPrice(cust.totalSpent) }}
+                    </td>
+                    <td>
+                      @if (cust.remarks) {
+                        <div style="background: rgba(245, 194, 66, 0.1); border: 1px dashed var(--mustard-2); color: var(--mustard-2); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; max-width: 180px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" [title]="cust.remarks">
+                          📝 {{ cust.remarks }}
+                        </div>
+                      } @else {
+                        <span class="text-faint" style="font-size: 12px;">—</span>
+                      }
+                    </td>
+                    <td class="text-faint font-mono" style="font-size: 12px;">
+                      {{ cust.createdDate | date:'mediumDate' }}
+                    </td>
+                    <td>
+                      <div class="table-actions" style="display: flex; gap: 6px; justify-content: flex-end;">
+                        <button (click)="openViewModal(cust)" class="icon-btn-sm btn-edit" title="View Customer Profile & Orders" style="background: rgba(245, 194, 66, 0.15); color: var(--mustard-2); border-color: rgba(229, 169, 60, 0.3);">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                        </button>
+                        <button (click)="openEditModal(cust)" class="icon-btn-sm btn-edit" title="Edit Customer & Remarks" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3);">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                        </button>
+                        <button (click)="openDeleteModal(cust)" class="icon-btn-sm btn-delete" title="Delete Customer" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3);">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div style="padding: 16px 24px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="font-size: 13px; color: var(--text-dim);">
+              Showing {{ (page - 1) * pageSize + 1 }} to {{ page * pageSize > totalCount ? totalCount : page * pageSize }} of {{ totalCount }} customers
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="btn btn-ghost btn-sm" [disabled]="page <= 1" (click)="goToPage(page - 1)">Previous</button>
+              <span style="font-size: 13px; color: var(--mustard-2); font-weight: 700; padding: 0 8px;">Page {{ page }} of {{ totalPages }}</span>
+              <button class="btn btn-ghost btn-sm" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">Next</button>
+            </div>
+          </div>
+        } @else {
+          <div class="empty-state font-dim" style="padding: 48px; text-align: center;">
+            No customers found matching your criteria.
+          </div>
+        }
+      </section>
+    }
+  </main>
+</div>
+
+<!-- View Customer Modal -->
+@if (isViewModalOpen && selectedCustomer) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Customer Profile</h2>
+        <button class="modal-close-btn" (click)="closeModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; background: var(--bg-1); padding: 18px; border-radius: var(--radius-m); border: 1px solid var(--line);">
+          <div>
+            <div style="font-size: 11px; color: var(--text-faint); text-transform: uppercase; font-weight: 700;">Full Name</div>
+            <div style="font-size: 16px; font-weight: 800; color: var(--mustard-2); margin-top: 2px;">{{ selectedCustomer.fullName }}</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--text-faint); text-transform: uppercase; font-weight: 700;">Mobile Number</div>
+            <div style="font-size: 16px; font-weight: 800; color: var(--text); margin-top: 2px;">{{ selectedCustomer.mobileNumber }}</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--text-faint); text-transform: uppercase; font-weight: 700;">City / Pincode</div>
+            <div style="font-size: 14px; color: var(--text-dim); margin-top: 2px;">{{ selectedCustomer.city }} - {{ selectedCustomer.pincode }}</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--text-faint); text-transform: uppercase; font-weight: 700;">Address</div>
+            <div style="font-size: 14px; color: var(--text-dim); margin-top: 2px;">{{ selectedCustomer.address || 'N/A' }}</div>
+          </div>
+          @if (selectedCustomer.remarks) {
+            <div style="grid-column: span 2; background: rgba(245, 194, 66, 0.08); border: 1px dashed var(--mustard-2); padding: 12px 14px; border-radius: 8px; margin-top: 8px;">
+              <div style="font-size: 11px; color: var(--mustard-2); text-transform: uppercase; font-weight: 800; letter-spacing: 0.05em;">📝 Internal Remarks (Backend Notes)</div>
+              <div style="font-size: 13.5px; color: #fff; margin-top: 4px; white-space: pre-wrap;">{{ selectedCustomer.remarks }}</div>
+            </div>
+          }
+        </div>
+
+        <h3 style="font-size: 18px; color: var(--mustard-2); margin-bottom: 12px;">Order History ({{ selectedCustomer.orderHistory?.length || 0 }})</h3>
+
+        @if (selectedCustomer.orderHistory && selectedCustomer.orderHistory.length > 0) {
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            @for (ord of selectedCustomer.orderHistory; track ord.orderNumber) {
+              <div style="background: var(--bg-1); border: 1px solid var(--line); border-radius: var(--radius-m); padding: 14px 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px;">
+                  <div>
+                    <span class="font-mono font-bold text-gold" style="font-size: 15px;">{{ ord.orderNumber }}</span>
+                    <span class="text-dim font-mono" style="font-size: 12px; margin-left: 12px;">{{ ord.orderDate | date:'medium' }}</span>
+                  </div>
+                  <div style="display: flex; gap: 12px; align-items: center;">
+                    <span class="status-pill" [ngClass]="getStatusClass(ord.orderStatus)">
+                      {{ ord.orderStatus }}
+                    </span>
+                    <span class="font-mono font-bold text-mustard" style="font-size: 15px;">{{ formatPrice(ord.totalAmount) }}</span>
+                  </div>
+                </div>
+
+                @if (ord.orderItems && ord.orderItems.length > 0) {
+                  <div class="table-responsive">
+                    <table class="admin-table" style="font-size: 12.5px;">
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Product Name</th>
+                          <th>Qty</th>
+                          <th>Price</th>
+                          <th style="text-align: right;">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (item of ord.orderItems; track item.orderItemId) {
+                          <tr>
+                            <td class="font-mono text-gold font-bold">{{ item.productCode }}</td>
+                            <td class="font-bold text-white">{{ item.productName }}</td>
+                            <td class="font-mono text-mustard">{{ item.quantity }}</td>
+                            <td class="font-mono text-dim">{{ formatPrice(item.unitPrice) }}</td>
+                            <td class="font-mono font-bold text-mustard" style="text-align: right;">{{ formatPrice(item.totalPrice) }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div style="font-size: 12px; color: var(--text-dim);">No product details items logged.</div>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <p style="font-size: 13px; color: var(--text-dim);">No order history recorded for this customer.</p>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" (click)="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- EDIT CUSTOMER MODAL -->
+@if (isEditModalOpen) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card modal-md" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>✏️ Edit Customer Profile</h2>
+        <button class="modal-close-btn" (click)="closeModal()">×</button>
+      </div>
+
+      <form (ngSubmit)="saveCustomer()">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+          @if (actionErrorMessage) {
+            <div style="background: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; color: #e57373; padding: 10px 14px; border-radius: 6px; font-size: 13px; font-weight: 600;">
+              ⚠️ {{ actionErrorMessage }}
+            </div>
+          }
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div>
+              <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px;">Customer Full Name *</label>
+              <input type="text" class="admin-input" [(ngModel)]="editCustomerData.fullName" name="fullName" required style="width: 100%;">
+            </div>
+
+            <div>
+              <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px;">Mobile Number *</label>
+              <input type="text" class="admin-input" [(ngModel)]="editCustomerData.mobileNumber" name="mobileNumber" required style="width: 100%;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div>
+              <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px;">Email Address</label>
+              <input type="email" class="admin-input" [(ngModel)]="editCustomerData.email" name="email" placeholder="e.g. name@domain.com" style="width: 100%;">
+            </div>
+
+            <div>
+              <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px;">City</label>
+              <input type="text" class="admin-input" [(ngModel)]="editCustomerData.city" name="city" placeholder="e.g. Sivakasi" style="width: 100%;">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 14px;">
+            <div>
+              <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px;">Pincode</label>
+              <input type="text" class="admin-input" [(ngModel)]="editCustomerData.pincode" name="pincode" placeholder="e.g. 626124" style="width: 100%;">
+            </div>
+
+            <div>
+              <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px;">Delivery / Street Address</label>
+              <input type="text" class="admin-input" [(ngModel)]="editCustomerData.address" name="address" placeholder="Door No, Street Name..." style="width: 100%;">
+            </div>
+          </div>
+
+          <!-- OPTIONAL BACKEND PURPOSE REMARKS SECTION -->
+          <div style="background: rgba(18, 14, 10, 0.6); border: 1px solid var(--mustard-2); border-radius: 8px; padding: 14px;">
+            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 800; color: var(--mustard-2); margin-bottom: 6px;">
+              <span>📝 Internal Remarks / Backend Notes</span>
+              <span style="font-size: 11px; background: rgba(245, 194, 66, 0.2); padding: 2px 8px; border-radius: 12px; color: #fff; font-weight: 600;">Optional • Backend Only</span>
+            </label>
+            <textarea 
+              rows="3" 
+              class="admin-input" 
+              [(ngModel)]="editCustomerData.remarks" 
+              name="remarks" 
+              placeholder="Add internal notes for this customer (e.g. Preferred courier, special discount history, phone call notes...)"
+              style="width: 100%; resize: vertical; font-size: 13px;"
+            ></textarea>
+            <p style="font-size: 11.5px; color: var(--text-dim); margin: 6px 0 0 0;">
+              ℹ️ Notes entered here are strictly for backend admin reference and are never shown to customers.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" (click)="closeModal()" [disabled]="isSaving">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving">
+            {{ isSaving ? 'Saving Changes...' : '💾 Save Customer Changes' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- DELETE CUSTOMER CONFIRMATION MODAL -->
+@if (isDeleteModalOpen && customerToDelete) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-card modal-sm" (click)="$event.stopPropagation()" style="max-width: 450px;">
+      <div class="modal-header" style="border-bottom-color: rgba(239, 68, 68, 0.3);">
+        <h2 style="color: #f87171;">⚠️ Confirm Delete Customer</h2>
+        <button class="modal-close-btn" (click)="closeModal()">×</button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px 24px;">
+        @if (actionErrorMessage) {
+          <div style="background: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; color: #e57373; padding: 10px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; margin-bottom: 14px;">
+            ⚠️ {{ actionErrorMessage }}
+          </div>
+        }
+
+        <p style="font-size: 14px; color: #fff; line-height: 1.5; margin: 0 0 12px 0;">
+          Are you sure you want to delete customer <strong style="color: var(--mustard-2);">{{ customerToDelete.fullName }}</strong> (<span style="font-family: monospace; color: #60a5fa;">{{ customerToDelete.mobileNumber }}</span>)?
+        </p>
+
+        <p style="font-size: 12.5px; color: #ef4444; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px 12px; border-radius: 6px; margin: 0;">
+          ⚠️ Warning: Deleting this customer will remove their profile and associated order records. This action cannot be undone.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" (click)="closeModal()" [disabled]="isDeleting">Cancel</button>
+        <button class="btn btn-primary" (click)="confirmDeleteCustomer()" [disabled]="isDeleting" style="background: #ef4444; border-color: #dc2626;">
+          {{ isDeleting ? 'Deleting Customer...' : '🗑️ Confirm & Delete Customer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

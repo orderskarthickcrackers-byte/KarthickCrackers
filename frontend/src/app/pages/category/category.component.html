@@ -1,0 +1,105 @@
+<div class="wrap">
+  <nav class="crumb">
+    <a routerLink="/home">Home</a><span class="sep">/</span>
+    <a routerLink="/listing">Shop all</a><span class="sep">/</span>
+    <span class="cur">{{ category?.name }}</span>
+  </nav>
+
+  <div class="cat-hero" style="justify-content: space-between; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+      <div class="cat-hero-icon">
+        @if (category?.image) {
+          <img [src]="category?.image" [alt]="category?.name">
+        }
+      </div>
+      <div>
+        <h1>{{ category?.name }}</h1>
+        <p>{{ category?.desc }}</p>
+      </div>
+    </div>
+    <div style="margin-top: 10px;">
+      <button (click)="onDownloadPriceList()" class="btn" style="background: linear-gradient(135deg, #FFB800, #D48800); color: #000; font-weight: 700; border: none; padding: 10px 20px; border-radius: var(--radius-pill); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(245, 194, 66, 0.3);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download {{ category?.name || 'Category' }} Price List
+      </button>
+    </div>
+  </div>
+
+  <div class="listing-layout">
+    <aside class="filters">
+      <div class="filter-block">
+        <h5>Category navigation</h5>
+        <div>
+          <!-- All Categories Option -->
+          <label class="filter-row" style="font-weight: 700; border-bottom: 1px dashed rgba(255, 255, 255, 0.12); padding-bottom: 8px; margin-bottom: 8px; color: var(--mustard-2); cursor: pointer;">
+            <input type="checkbox" [checked]="isAllSelected" (change)="onAllCategoryToggle($event)">
+            🌟 All Categories
+          </label>
+
+          @for (c of categories; track c.id) {
+            <label class="filter-row">
+              <input type="checkbox" [checked]="!isAllSelected && selectedCategories[c.id]" (change)="onCategoryToggle(c.id, $event)">
+              {{ c.name }} <span class="filter-count">{{ c.count }}</span>
+            </label>
+          }
+        </div>
+      </div>
+      <div class="filter-block">
+        <h5>Price range</h5>
+        <input type="range" min="50" max="3000" value="3000">
+        <div class="range-row"><span>₹50</span><span>Up to ₹3,000</span></div>
+      </div>
+    </aside>
+    <div>
+      <div class="listing-toolbar">
+        <p class="results-note">Showing {{ products.length }} product{{ products.length === 1 ? '' : 's' }} in {{ category?.name }}</p>
+        <select class="sort-select">
+          <option>Sort: Most popular</option>
+          <option>Price: Low to high</option>
+          <option>Price: High to low</option>
+        </select>
+      </div>
+      @if (isGiftBoxCategoryOnly) {
+        <div class="giftbox-icon-grid">
+          @for (p of products; track p.code) {
+            <div class="giftbox-icon-card">
+              <div class="giftbox-badge">55% OFF</div>
+              <div class="giftbox-icon-wrapper">
+                <span class="giftbox-emoji">{{ getGiftBoxEmoji(p.name) }}</span>
+              </div>
+              <div class="giftbox-details">
+                <div class="giftbox-header">
+                  <span class="giftbox-code">Code #{{ p.code }}</span>
+                  <span class="giftbox-items-badge">📦 {{ p.unit }}</span>
+                </div>
+                <h4 class="giftbox-title">{{ p.name }}</h4>
+                <div class="giftbox-price-row">
+                  <span class="giftbox-price">₹{{ p.price }}</span>
+                  <span class="giftbox-mrp" *ngIf="p.mrpPrice">₹{{ p.mrpPrice }}</span>
+                  <span class="giftbox-stock" *ngIf="p.totalQuantity">CS Count: {{ p.totalQuantity }}</span>
+                </div>
+                <div class="giftbox-action-row">
+                  <div class="qty-control" *ngIf="cartService.getItemQty(p.code) > 0" style="display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(255,255,255,0.06); padding: 4px 12px; border-radius: 30px; border: 1px solid var(--mustard-dim);">
+                    <button (click)="cartService.decrementQty(p.code)" style="background: none; border: none; color: var(--mustard-2); font-weight: 800; font-size: 16px; cursor: pointer; padding: 0 6px;">-</button>
+                    <span style="font-weight: 800; color: #fff; font-size: 14px;">{{ cartService.getItemQty(p.code) }}</span>
+                    <button (click)="cartService.addToCart(p.code, 1)" style="background: none; border: none; color: var(--mustard-2); font-weight: 800; font-size: 16px; cursor: pointer; padding: 0 6px;">+</button>
+                  </div>
+                  <button *ngIf="cartService.getItemQty(p.code) === 0" (click)="cartService.addToCart(p.code, 1)" class="btn-add-giftbox">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    Add Gift Box
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="product-grid">
+          @for (p of products; track p.code) {
+            <app-product-card [product]="p"></app-product-card>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

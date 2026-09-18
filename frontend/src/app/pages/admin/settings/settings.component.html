@@ -1,0 +1,163 @@
+<div class="admin-page-wrapper">
+  <app-admin-sidebar></app-admin-sidebar>
+
+  <main class="admin-main-content">
+    <header class="admin-topbar">
+      <div>
+        <h1 class="admin-page-title">Payment & UPI Settings</h1>
+        <p class="admin-page-subtitle">Manage store UPI ID, scannable QR Code image, and support contact details dynamically.</p>
+      </div>
+    </header>
+
+    <div style="max-width: 1100px;">
+
+      @if (successMessage) {
+        <div style="background: rgba(76, 175, 80, 0.15); border: 1px solid #4caf50; color: #81c784; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 600;">
+          ✓ {{ successMessage }}
+        </div>
+      }
+
+      @if (errorMessage) {
+        <div style="background: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; color: #e57373; padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 600;">
+          ⚠️ {{ errorMessage }}
+        </div>
+      }
+
+      @if (loading) {
+        <div style="font-size: 13px; color: var(--mustard-2); margin-bottom: 16px;">
+          ⏳ Synchronizing payment settings...
+        </div>
+      }
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+
+          <!-- LEFT CARD: UPI & STORE SETTINGS FORM -->
+          <div style="background: rgba(18, 14, 10, 0.85); border: 1px solid var(--line); border-radius: 12px; padding: 24px;">
+            <h3 style="margin-top: 0; color: var(--mustard-2); font-size: 16px; margin-bottom: 18px;">💳 Store Payment Configuration</h3>
+
+            <form (ngSubmit)="saveSettings()" #settingsForm="ngForm">
+              <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px;">UPI ID (Default: 9952378965&#64;upi)</label>
+                <input type="text" [(ngModel)]="formData.upiId" name="upiId" required style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 8px; color: #fff; font-size: 14px; font-family: monospace;">
+              </div>
+
+              <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px;">Support / Call Mobile Number</label>
+                <input type="text" [(ngModel)]="formData.callNumber" name="callNumber" required style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 8px; color: #fff; font-size: 14px;">
+              </div>
+
+              <hr style="border: 0; border-top: 1px solid var(--line); margin: 20px 0;">
+
+              <h4 style="margin-top: 0; color: var(--text-dim); font-size: 14px; margin-bottom: 12px;">Optional Bank Transfer Details</h4>
+
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px;">Account Holder Name</label>
+                <input type="text" [(ngModel)]="formData.accountHolder" name="accountHolder" placeholder="e.g. Karthick Crackers" style="width: 100%; padding: 8px 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 6px; color: #fff; font-size: 13px;">
+              </div>
+
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px;">Bank Name</label>
+                <input type="text" [(ngModel)]="formData.bankName" name="bankName" placeholder="e.g. HDFC Bank" style="width: 100%; padding: 8px 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 6px; color: #fff; font-size: 13px;">
+              </div>
+
+              <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px;">Account Number</label>
+                <input type="text" [(ngModel)]="formData.accountNumber" name="accountNumber" placeholder="e.g. 50100012345678" style="width: 100%; padding: 8px 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 6px; color: #fff; font-size: 13px;">
+              </div>
+
+              <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px;">IFSC Code</label>
+                <input type="text" [(ngModel)]="formData.ifscCode" name="ifscCode" placeholder="e.g. HDFC0001234" style="width: 100%; padding: 8px 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 6px; color: #fff; font-size: 13px;">
+              </div>
+
+              <button type="submit" [disabled]="saving" class="btn btn-primary btn-block" style="padding: 12px; font-weight: 700;">
+                {{ saving ? 'Saving Changes...' : '💾 Save Payment Configuration' }}
+              </button>
+            </form>
+          </div>
+
+          <!-- RIGHT CARD: DYNAMIC QR CODE MANAGEMENT -->
+          <div style="background: rgba(18, 14, 10, 0.85); border: 1px solid var(--line); border-radius: 12px; padding: 24px; text-align: center;">
+            <h3 style="margin-top: 0; color: var(--mustard-2); font-size: 16px; margin-bottom: 18px;">📱 Dynamic UPI QR Code Image</h3>
+
+            <!-- QR PREVIEW -->
+            <div style="background: #ffffff; padding: 16px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.4); margin-bottom: 18px;">
+              <img [src]="qrPreviewUrl" alt="Current QR Code" style="width: 200px; height: 200px; object-fit: contain; display: block;">
+            </div>
+
+            <p style="font-size: 12.5px; color: var(--text-dim); margin-bottom: 18px; line-height: 1.4;">
+              This QR code is displayed on customer Order Placed page and order confirmations. Upload a new image to update it dynamically at runtime.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+              <input type="file" (change)="onFileSelected($event)" accept="image/png,image/jpeg,image/webp" id="qrFileInput" style="display: none;">
+              <label for="qrFileInput" class="btn btn-ghost" style="cursor: pointer; padding: 10px 18px; font-size: 13px; width: 100%; box-sizing: border-box; border: 1px dashed var(--mustard-2);">
+                📷 Choose New QR Image File
+              </label>
+
+              @if (selectedFile) {
+                <div style="font-size: 12px; color: var(--mustard-2); font-weight: 600;">
+                  Selected: {{ selectedFile.name }}
+                </div>
+
+                <button (click)="uploadQrCode()" [disabled]="uploadingQr" class="btn btn-primary" style="width: 100%; padding: 10px; font-size: 13px;">
+                  {{ uploadingQr ? 'Uploading Image...' : '⬆️ Upload & Update Live QR Code' }}
+                </button>
+              }
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- FULL-WIDTH CARD: CHANGE ADMIN PASSWORD -->
+        <div style="margin-top: 24px; background: rgba(18, 14, 10, 0.85); border: 1px solid var(--line); border-radius: 12px; padding: 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h3 style="margin: 0; color: var(--mustard-2); font-size: 16px;">🔒 Change Admin Password</h3>
+              <p style="margin: 4px 0 0 0; font-size: 12.5px; color: var(--text-dim);">Official Admin Account Security Settings</p>
+            </div>
+            <div style="background: rgba(229, 169, 60, 0.15); border: 1px solid var(--mustard-2); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #fff;">
+              Official Admin Email: <strong style="color: var(--mustard-2);">{{ adminOfficialEmail }}</strong>
+            </div>
+          </div>
+
+          @if (passwordSuccessMessage) {
+            <div style="background: rgba(76, 175, 80, 0.15); border: 1px solid #4caf50; color: #81c784; padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 600; font-size: 13px;">
+              ✓ {{ passwordSuccessMessage }}
+            </div>
+          }
+
+          @if (passwordErrorMessage) {
+            <div style="background: rgba(244, 67, 54, 0.15); border: 1px solid #f44336; color: #e57373; padding: 10px 16px; border-radius: 6px; margin-bottom: 16px; font-weight: 600; font-size: 13px;">
+              ⚠️ {{ passwordErrorMessage }}
+            </div>
+          }
+
+          <form (ngSubmit)="changePassword()" #passwordForm="ngForm">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px;">
+              <div>
+                <label style="display: block; font-size: 12.5px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px;">Current Password *</label>
+                <input type="password" [(ngModel)]="passwordData.currentPassword" name="currentPassword" required placeholder="Enter current password" style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+              </div>
+
+              <div>
+                <label style="display: block; font-size: 12.5px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px;">New Password *</label>
+                <input type="password" [(ngModel)]="passwordData.newPassword" name="newPassword" required placeholder="Minimum 6 characters" style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+              </div>
+
+              <div>
+                <label style="display: block; font-size: 12.5px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px;">Confirm New Password *</label>
+                <input type="password" [(ngModel)]="passwordData.confirmNewPassword" name="confirmNewPassword" required placeholder="Re-enter new password" style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.4); border: 1px solid var(--line); border-radius: 8px; color: #fff; font-size: 14px; box-sizing: border-box;">
+              </div>
+            </div>
+
+            <button type="submit" [disabled]="changingPassword" class="btn btn-primary" style="padding: 11px 24px; font-weight: 700; font-size: 14px;">
+              {{ changingPassword ? 'Updating Password...' : '🔒 Update Admin Password' }}
+            </button>
+          </form>
+        </div>
+
+    </div>
+  </main>
+</div>

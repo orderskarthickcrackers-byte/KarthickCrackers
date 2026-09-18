@@ -1,0 +1,260 @@
+<!-- Top Contact & Announcement Ribbon (Sliding Ticker) -->
+<div class="top-announcement-bar" title="Hover to pause continuous announcement ticker">
+  <div class="announcement-ticker-wrap">
+    <div class="announcement-ticker-track">
+      <!-- Set 1 -->
+      <div class="announcement-ticker-item">
+        <span class="pulse-badge">🎆 DIWALI 2026 FACTORY OUTLET</span>
+        <span class="announcement-text">Flat <b>55% OFF</b> on All Crackers! Direct Sivakasi Wholesale & Retail</span>
+        <span class="announcement-divider">✦</span>
+        <a [href]="'tel:+' + paymentSettingsService.cleanPhoneSignal()" class="contact-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> {{ paymentSettingsService.displayPhoneSignal() }}</a>
+        <span class="announcement-divider">✦</span>
+        <a [href]="'https://wa.me/' + paymentSettingsService.cleanPhoneSignal()" target="_blank" class="contact-link wa"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.36 2 11.74c0 2.07.62 3.99 1.68 5.6L2 22l4.85-1.55A10.1 10.1 0 0 0 12 21.48c5.52 0 10-4.36 10-9.74S17.52 2 12 2Zm0 17.7c-1.65 0-3.2-.46-4.52-1.26l-.32-.19-3.1.99.97-3.05-.2-.32a7.86 7.86 0 0 1-1.24-4.13c0-4.4 3.72-7.98 8.41-7.98s8.41 3.58 8.41 7.98-3.72 7.96-8.41 7.96Zm4.53-5.87c-.25-.13-1.47-.73-1.7-.81-.23-.08-.4-.13-.56.13-.17.25-.65.81-.79.98-.15.17-.29.19-.54.06-.25-.13-1.06-.4-2.02-1.26-.75-.68-1.25-1.51-1.4-1.77-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.12-.15.16-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.37-.77-1.87-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.87.86-.87 2.11s.9 2.45 1.02 2.62c.13.17 1.77 2.77 4.29 3.78.6.26 1.07.42 1.43.53.6.19 1.15.17 1.58.1.48-.07 1.47-.6 1.68-1.19.21-.58.21-1.08.15-1.19-.06-.11-.23-.17-.48-.3Z"/></svg> WhatsApp Order</a>
+        <span class="announcement-divider">✦</span>
+        <span class="location-badge">📍 Maraneri, Sivakasi</span>
+        <span class="announcement-divider">✦</span>
+        <span class="announcement-text">Minimum Order: <b>₹2,500</b></span>
+        <span class="announcement-divider">✦</span>
+        <span class="announcement-text">Dispatch: <b>Based on Transport Availability</b></span>
+        <span class="announcement-divider">✦</span>
+      </div>
+
+      <!-- Set 2 (Duplicate for Continuous Loop) -->
+      <div class="announcement-ticker-item" aria-hidden="true">
+        <span class="pulse-badge">🎆 DIWALI 2026 FACTORY OUTLET</span>
+        <span class="announcement-text">Flat <b>55% OFF</b> on All Crackers! Direct Sivakasi Wholesale & Retail</span>
+        <span class="announcement-divider">✦</span>
+        <a [href]="'tel:+' + paymentSettingsService.cleanPhoneSignal()" class="contact-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> {{ paymentSettingsService.displayPhoneSignal() }}</a>
+        <span class="announcement-divider">✦</span>
+        <a [href]="'https://wa.me/' + paymentSettingsService.cleanPhoneSignal()" target="_blank" class="contact-link wa"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.36 2 11.74c0 2.07.62 3.99 1.68 5.6L2 22l4.85-1.55A10.1 10.1 0 0 0 12 21.48c5.52 0 10-4.36 10-9.74S17.52 2 12 2Zm0 17.7c-1.65 0-3.2-.46-4.52-1.26l-.32-.19-3.1.99.97-3.05-.2-.32a7.86 7.86 0 0 1-1.24-4.13c0-4.4 3.72-7.98 8.41-7.98s8.41 3.58 8.41 7.98-3.72 7.96-8.41 7.96Zm4.53-5.87c-.25-.13-1.47-.73-1.7-.81-.23-.08-.4-.13-.56.13-.17.25-.65.81-.79.98-.15.17-.29.19-.54.06-.25-.13-1.06-.4-2.02-1.26-.75-.68-1.25-1.51-1.4-1.77-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.12-.15.16-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.37-.77-1.87-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.87.86-.87 2.11s.9 2.45 1.02 2.62c.13.17 1.77 2.77 4.29 3.78.6.26 1.07.42 1.43.53.6.19 1.15.17 1.58.1.48-.07 1.47-.6 1.68-1.19.21-.58.21-1.08.15-1.19-.06-.11-.23-.17-.48-.3Z"/></svg> WhatsApp Order</a>
+        <span class="announcement-divider">✦</span>
+        <span class="location-badge">📍 Maraneri, Sivakasi</span>
+        <span class="announcement-divider">✦</span>
+        <span class="announcement-text">Minimum Order: <b>₹2,500</b></span>
+        <span class="announcement-divider">✦</span>
+        <span class="announcement-text">Dispatch: <b>Based on Transport Availability</b></span>
+        <span class="announcement-divider">✦</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Big Festive Hero Banner Section -->
+<div class="grand-hero" id="hero-block">
+  <div class="hero-sparkle-bg"></div>
+  <div class="wrap">
+    <div class="hero-layout-grid">
+      <!-- Left Hero Copy -->
+      <div class="grand-hero-copy">
+        <h1>Light Up The Celebration With <em>Original Sivakasi</em> Crackers</h1>
+        
+        <p class="lede">Buy 100% genuine, PESO safety-certified crackers directly from our factory at lowest wholesale prices. Fresh 2026 stock, 180+ items, and express transport delivery across Tamil Nadu & India!</p>
+
+        <div class="hero-actions-row">
+          <a routerLink="/listing" class="btn btn-primary btn-hero-main">
+            🛒 Shop 55% OFF Collection
+          </a>
+          <button (click)="onDownloadPriceList()" class="btn btn-price-pdf">
+            📥 Download Price List PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Hero Visual Emblem Card -->
+      <div class="grand-hero-visual">
+        <div class="official-emblem-card">
+          <div class="emblem-glow"></div>
+          <img src="assets/images/karthick-crackers-logo.jpg" alt="Official Karthick Crackers Logo" class="official-logo-img">
+          <div class="emblem-footer">
+            <div class="ef-tag">SIVAKASI DIRECT OUTLET</div>
+            <div class="ef-desc">Official 2026 Price List & Online Booking</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Full-width Trust Bar -->
+    <div class="hero-trust-bar">
+      <div class="tb-item">
+        <span class="tb-icon">🏭</span>
+        <div><b>Direct Factory</b><span>Sivakasi Outlet</span></div>
+      </div>
+      <div class="tb-item">
+        <span class="tb-icon">💥</span>
+        <div><b>Flat 55% OFF</b><span>Wholesale Rate</span></div>
+      </div>
+      <div class="tb-item">
+        <span class="tb-icon">🛡️</span>
+        <div><b>100% Safe</b><span>PESO Certified</span></div>
+      </div>
+      <div class="tb-item">
+        <span class="tb-icon">🚚</span>
+        <div><b>Express Dispatch</b><span>Pan-India Transport</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Featured Products Section -->
+<div class="wrap section-tight">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Featured this week</p>
+      <h2>Best-selling Sivakasi fireworks</h2>
+    </div>
+    <a routerLink="/listing" class="btn btn-ghost btn-sm">Browse full catalogue</a>
+  </div>
+  <div class="product-grid">
+    @for (product of featuredProducts; track product.code) {
+      <app-product-card [product]="product"></app-product-card>
+    }
+  </div>
+</div>
+
+<!-- Shop By Category Section -->
+<div class="wrap section-tight">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Shop by category</p>
+      <h2>Find your kind of spark</h2>
+    </div>
+    <a routerLink="/category/all" class="btn btn-ghost btn-sm">View all categories</a>
+  </div>
+  <div class="cat-grid">
+    @for (cat of categories; track cat.id) {
+      <app-category-tile [category]="cat"></app-category-tile>
+    }
+  </div>
+</div>
+
+<!-- Special Festive Offer Banner -->
+<div class="wrap section-tight">
+  <div class="promo">
+    <div class="promo-text">
+      <p class="eyebrow">Special festive offer</p>
+      <h3>Flat 55% OFF On All Products</h3>
+      <p>Enjoy a flat 55% discount on all products directly from Sivakasi factory. Discount is calculated automatically on all orders. Express transport delivery available for all orders!</p>
+    </div>
+    <a routerLink="/listing" class="btn btn-primary">Shop 55% OFF Now</a>
+  </div>
+</div>
+
+<!-- Why Choose Us -->
+<div class="wrap section-tight">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Why buy from us</p>
+      <h2>Built on 16+ years of Sivakasi manufacturing excellence</h2>
+    </div>
+  </div>
+  <div class="why-grid">
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+      <h4>Tested and certified</h4>
+      <p>Every batch is quality-checked to PESO safety norms before it leaves our Sivakasi warehouse.</p>
+    </div>
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-6h6v6"/></svg>
+      <h4>Direct factory pricing</h4>
+      <p>No middlemen — you buy directly from our factory outlet at lowest prices with flat 55% discount.</p>
+    </div>
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="6" width="15" height="12" rx="1.5"/><path d="M16 10h4l3 3v5h-7z"/><circle cx="6" cy="19" r="1.6"/><circle cx="18.5" cy="19" r="1.6"/></svg>
+      <h4>Safe, sealed dispatch</h4>
+      <p>Reinforced cartons and licensed transport, packed the same day you order.</p>
+    </div>
+    <div class="why-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <h4>Real human support</h4>
+      <p>Message us on WhatsApp for live stock checks, custom combo orders, or bulk discount quotes.</p>
+    </div>
+  </div>
+</div>
+
+<!-- STORE LOCATION & GOOGLE MAPS SECTION -->
+<div class="wrap section-tight" id="store-location-section">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Store Location & Factory Outlet</p>
+      <h2>Visit Our Showroom In Sivakasi</h2>
+      <p>Buy directly from our physical store outlet or get in touch for bulk orders & express transport booking.</p>
+    </div>
+  </div>
+
+  <div class="location-grid">
+    <!-- Contact & Store Card -->
+    <div class="location-card">
+      <div class="lc-header">
+        <img src="assets/images/karthick-crackers-logo.jpg" alt="Logo" class="lc-logo">
+        <div>
+          <h3>Karthick Crackers</h3>
+          <span class="lc-sub">Direct Factory Outlet & Showroom</span>
+        </div>
+      </div>
+
+      <div class="lc-details-list">
+        <div class="lc-item">
+          <span class="lc-icon">📍</span>
+          <div>
+            <strong>Address</strong>
+            <p>3/347/U, Inthira Group House, Maraneri Village, Sivakasi - 626124, Tamil Nadu, India.</p>
+          </div>
+        </div>
+
+        <div class="lc-item">
+          <span class="lc-icon">📞</span>
+          <div>
+            <strong>Contact Phone</strong>
+            <p>
+              <a [href]="'tel:+' + paymentSettingsService.cleanPhoneSignal()" class="phone-link">{{ paymentSettingsService.displayPhoneSignal() }}</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="lc-item">
+          <span class="lc-icon">💬</span>
+          <div>
+            <strong>WhatsApp Quick Chat</strong>
+            <p><a [href]="'https://wa.me/' + paymentSettingsService.cleanPhoneSignal()" target="_blank" class="wa-link">{{ paymentSettingsService.displayPhoneSignal() }} (Click to Chat)</a></p>
+          </div>
+        </div>
+
+        <div class="lc-item">
+          <span class="lc-icon">✉️</span>
+          <div>
+            <strong>Email Address</strong>
+            <p><a href="mailto:orders.karthick.crackers@gmail.com" class="phone-link">orders.karthick.crackers@gmail.com</a></p>
+          </div>
+        </div>
+
+        <div class="lc-item">
+          <span class="lc-icon">⏰</span>
+          <div>
+            <strong>Working Hours</strong>
+            <p>Monday – Sunday: 8:00 AM – 10:00 PM (Open 7 Days)</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lc-actions">
+        <a href="https://www.google.com/maps/place/Karthick+Crackers/@9.4209365,77.7371372,783m/data=!3m2!1e3!4b1!4m6!3m5!1s0x3b06c5c4d311314b:0x9b8974031480aa69!8m2!3d9.4209365!4d77.7371372!16s%2Fg%2F11zypv1z4_!18m1!1e1?entry=ttu&g_ep=EgoyMDI2MDkwOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="btn btn-primary btn-block">
+          🧭 Open Directions in Google Maps
+        </a>
+      </div>
+    </div>
+
+    <!-- Embedded Responsive Google Map -->
+    <div class="location-map-box">
+      <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3937.198276189395!2d77.7371372!3d9.4209365!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b06c5c4d311314b%3A0x9b8974031480aa69!2sKarthick%20Crackers!5e0!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin" 
+        width="100%" 
+        height="440" 
+        style="border:0; border-radius: 16px;" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Karthick Crackers Sivakasi Map Location">
+      </iframe>
+    </div>
+  </div>
+</div>

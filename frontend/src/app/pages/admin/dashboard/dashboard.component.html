@@ -1,0 +1,429 @@
+<div class="admin-page-wrapper">
+  <app-admin-sidebar></app-admin-sidebar>
+
+  <main class="admin-main-content">
+    <header class="admin-topbar">
+      <div>
+        <h1 class="admin-page-title">Dashboard Overview</h1>
+        <p class="admin-page-subtitle">Real-time metrics, order performance, and store status</p>
+      </div>
+
+      <div class="admin-topbar-actions">
+        <button (click)="loadDashboardData()" class="btn btn-ghost btn-sm" [disabled]="isLoading">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </header>
+
+    @if (errorMessage) {
+      <div class="admin-error-banner">
+        <div class="error-text">{{ errorMessage }}</div>
+        <button (click)="loadDashboardData()" class="btn btn-primary btn-sm">Try Again</button>
+      </div>
+    } @else if (isLoading) {
+      <div class="admin-loading-state">
+        <div class="spinner"></div>
+        <p>Fetching dynamic dashboard data from database...</p>
+      </div>
+    } @else if (stats) {
+      <!-- 9 Dynamic Stat Cards -->
+      <section class="admin-stats-grid">
+        <!-- Card 1: Total Products -->
+        <div class="stat-card">
+          <div class="stat-icon icon-gold">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <span class="stat-label">Total Products</span>
+            <span class="stat-value">{{ stats.totalProducts }}</span>
+            <span class="stat-sub font-mono">Catalog items</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Active Products -->
+        <div class="stat-card">
+          <div class="stat-icon icon-emerald">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <span class="stat-label">Active Products</span>
+            <span class="stat-value text-emerald">{{ stats.activeProducts }}</span>
+            <span class="stat-sub font-mono">In-stock & live</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Total Categories -->
+        <div class="stat-card">
+          <div class="stat-icon icon-amber">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <span class="stat-label">Total Categories</span>
+            <span class="stat-value">{{ stats.totalCategories }}</span>
+            <span class="stat-sub font-mono">Product groups</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Total Orders -->
+        <div class="stat-card">
+          <div class="stat-icon icon-cyan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <span class="stat-label">Total Orders</span>
+            <span class="stat-value">{{ stats.totalOrders }}</span>
+            <span class="stat-sub font-mono">Lifetime count</span>
+          </div>
+        </div>
+
+        <!-- Card 5: Today's Orders -->
+        <div class="stat-card highlight">
+          <div class="stat-icon icon-gold-bg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <span class="stat-label text-gold">Today's Orders</span>
+            <span class="stat-value text-gold">{{ stats.todayOrders }}</span>
+            <span class="stat-sub text-gold font-mono">Received today</span>
+          </div>
+        </div>
+
+        <!-- Card 6: Pending Orders -->
+        <div class="stat-card">
+          <div class="stat-icon icon-warning">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <span class="stat-label">Pending Orders</span>
+            <span class="stat-value text-warning">{{ stats.pendingOrders }}</span>
+            <span class="stat-sub font-mono">Awaiting dispatch</span>
+          </div>
+        </div>
+
+        <!-- Card 7: Dispatched Orders -->
+        <div class="stat-card">
+          <div class="stat-icon icon-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <span class="stat-label">Dispatched Orders</span>
+            <span class="stat-value text-blue">{{ stats.dispatchedOrders }}</span>
+            <span class="stat-sub font-mono">In transit</span>
+          </div>
+        </div>
+
+        <!-- Card 8: Delivered Orders -->
+        <div class="stat-card">
+          <div class="stat-icon icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <span class="stat-label">Delivered Orders</span>
+            <span class="stat-value text-green">{{ stats.deliveredOrders }}</span>
+            <span class="stat-sub font-mono">Successfully fulfilled</span>
+          </div>
+        </div>
+
+        <!-- Card 9: Cancelled Orders -->
+        <div class="stat-card">
+          <div class="stat-icon icon-danger">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+          </div>
+          <div class="stat-body">
+            <span class="stat-label">Cancelled Orders</span>
+            <span class="stat-value text-danger">{{ stats.cancelledOrders }}</span>
+            <span class="stat-sub font-mono">Voided/Returned</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Orders Section with Filter & Pagination -->
+      <section class="admin-section-card">
+        <div class="card-header" style="flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;">
+          <div>
+            <h3>Order Placed Customer Details</h3>
+            <p class="card-subtitle">Manage customer orders, change status (Dispatched, Delivered, etc.), and send WhatsApp updates</p>
+          </div>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <div style="position: relative; width: 240px;">
+              <input 
+                type="text" 
+                class="admin-input" 
+                placeholder="Search order or customer..." 
+                [(ngModel)]="searchQuery" 
+                (ngModelChange)="onFilterChange()"
+                style="padding-left: 32px; width: 100%; height: 36px; font-size: 13px;"
+              >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--text-dim);">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+
+            <select class="admin-input" style="width: 140px; height: 36px; font-size: 13px;" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+              <option value="All">All Statuses</option>
+              <option value="Order Placed">Order Placed</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Processing">Processing</option>
+              <option value="Dispatched">Dispatched</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+
+            <select class="admin-input" style="width: 75px; height: 36px; font-size: 13px;" [(ngModel)]="pageSize" (change)="onFilterChange()">
+              <option [value]="10">10</option>
+              <option [value]="25">25</option>
+              <option [value]="50">50</option>
+            </select>
+          </div>
+        </div>
+
+        @if (pagedOrders && pagedOrders.length > 0) {
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Customer Details</th>
+                  <th>Ordered Products</th>
+                  <th>City / Address</th>
+                  <th>Order Date</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (order of pagedOrders; track order.orderNumber) {
+                  <tr>
+                    <td class="font-mono font-bold text-gold">{{ order.orderNumber }}</td>
+                    <td>
+                      <div class="font-bold text-white">{{ order.customerName }}</div>
+                      <div style="font-size: 12px; color: var(--mustard-2);" class="font-mono">{{ order.customerPhone }}</div>
+                    </td>
+                    <td>
+                      @if (order.items && order.items.length > 0) {
+                        <div style="font-size: 12.5px; max-width: 220px; line-height: 1.4;">
+                          <button (click)="openViewOrderModal(order)" class="btn btn-ghost btn-sm" style="padding: 2px 8px; font-size: 11px; margin-top: 4px; border: 1px solid var(--line);">
+                            📦 View Products ({{ order.items.length }})
+                          </button>
+                        </div>
+                      } @else {
+                        <span class="text-dim" style="font-size: 12px;">{{ order.itemsCount || 0 }} items</span>
+                      }
+                    </td>
+                    <td class="text-dim" style="font-size: 12.5px; max-width: 200px;">
+                      {{ order.address || order.city || 'N/A' }}
+                    </td>
+                    <td class="text-dim font-mono" style="font-size: 12px;">{{ order.orderDate | date:'mediumDate' }}</td>
+                    <td class="font-mono font-bold text-mustard">₹{{ order.totalAmount | number:'1.2-2' }}</td>
+                    <td>
+                      <span class="order-badge" [ngClass]="getStatusClass(order.status)">
+                        {{ order.status }}
+                      </span>
+                    </td>
+                    <td style="text-align: right;">
+                      <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                        <button (click)="openEditStatusModal(order)" class="btn btn-sm" style="background: linear-gradient(135deg, #FFB800, #D48800); color: #000; font-weight: 700; border: none; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;" title="Edit Order Status (Dispatched, Delivered, etc.)">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width: 14px; height: 14px;">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                          <span>Edit Status</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div style="padding: 16px 24px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="font-size: 13px; color: var(--text-dim);">
+              Showing {{ (page - 1) * pageSize + 1 }} to {{ page * pageSize > filteredOrders.length ? filteredOrders.length : page * pageSize }} of {{ filteredOrders.length }} orders
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="btn btn-ghost btn-sm" [disabled]="page <= 1" (click)="goToPage(page - 1)">Previous</button>
+              <span style="font-size: 13px; color: var(--mustard-2); font-weight: 700; padding: 0 8px;">Page {{ page }} of {{ totalPages }}</span>
+              <button class="btn btn-ghost btn-sm" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">Next</button>
+            </div>
+          </div>
+        } @else {
+          <div class="empty-state font-dim" style="padding: 48px; text-align: center;">
+            No orders found matching your search or status filter.
+          </div>
+        }
+      </section>
+    }
+  </main>
+</div>
+
+<!-- Edit Order Status Modal -->
+@if (isEditModalOpen && selectedOrder) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Update Order Status</h2>
+        <button class="modal-close-btn" (click)="closeEditModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        @if (updateSuccessMessage) {
+          <div class="admin-success-banner">
+            {{ updateSuccessMessage }}
+          </div>
+        }
+
+        <div style="background: var(--bg-1); padding: 14px; border-radius: var(--radius-s); margin-bottom: 18px; border: 1px solid var(--line);">
+          <div style="display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 700; color: var(--mustard-2);">
+            <span>Order #{{ selectedOrder.orderNumber }}</span>
+            <span>₹{{ selectedOrder.totalAmount | number:'1.2-2' }}</span>
+          </div>
+          <div style="font-size: 13px; color: var(--text); margin-top: 4px;">
+            Customer: <strong>{{ selectedOrder.customerName }}</strong> ({{ selectedOrder.customerPhone }})
+          </div>
+          @if (selectedOrder.items && selectedOrder.items.length > 0) {
+            <div style="margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 8px;">
+              <div style="font-size: 11.5px; font-weight: 700; color: var(--gold-light); text-transform: uppercase; margin-bottom: 4px;">Ordered Products:</div>
+              @for (it of selectedOrder.items; track it.orderItemId) {
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); margin-bottom: 2px;">
+                  <span>• {{ it.productName }} ({{ it.productCode }}) × {{ it.quantity }}</span>
+                  <span class="font-mono">₹{{ it.totalPrice | number:'1.2-2' }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="mod-status">Select New Status</label>
+          <select id="mod-status" class="admin-input" [(ngModel)]="newStatus">
+            @for (st of availableStatuses; track st) {
+              <option [value]="st">{{ st }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="mod-remarks">Status Remarks / Tracking Info (Optional)</label>
+          <textarea id="mod-remarks" class="admin-input" rows="3" [(ngModel)]="statusRemarks" placeholder="e.g. Dispatched via Professional Courier - Tracking #123456"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" (click)="closeEditModal()" [disabled]="isUpdatingStatus">Cancel</button>
+        <button class="btn btn-primary" (click)="submitStatusUpdate()" [disabled]="isUpdatingStatus">
+          {{ isUpdatingStatus ? 'Updating...' : 'Save & Update Status' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- View Order Products Modal -->
+@if (isViewModalOpen && selectedViewOrder) {
+  <div class="modal-overlay" (click)="closeViewOrderModal()">
+    <div class="modal-card modal-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Ordered Product Details - Order #{{ selectedViewOrder.orderNumber }}</h2>
+        <button class="modal-close-btn" (click)="closeViewOrderModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: var(--bg-1); padding: 14px; border-radius: var(--radius-s); border: 1px solid var(--line);">
+          <div>
+            <div style="font-size: 11px; color: var(--text-faint); text-transform: uppercase; font-weight: 700;">Customer</div>
+            <div style="font-size: 14px; font-weight: 700; color: var(--mustard-2);">{{ selectedViewOrder.customerName }} ({{ selectedViewOrder.customerPhone }})</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--text-faint); text-transform: uppercase; font-weight: 700;">Location</div>
+            <div style="font-size: 13.5px; color: var(--text);">{{ selectedViewOrder.address || selectedViewOrder.city }}</div>
+          </div>
+        </div>
+
+        <h3 style="font-size: 15px; color: var(--mustard-2); margin-bottom: 10px;">Products List ({{ selectedViewOrder.items?.length || 0 }})</h3>
+
+        @if (selectedViewOrder.items && selectedViewOrder.items.length > 0) {
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product Code</th>
+                  <th>Product Name</th>
+                  <th>Quantity</th>
+                  <th>Unit Price</th>
+                  <th style="text-align: right;">Total Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of selectedViewOrder.items; track item.orderItemId; let idx = $index) {
+                  <tr>
+                    <td>{{ idx + 1 }}</td>
+                    <td class="font-mono font-bold text-gold">{{ item.productCode }}</td>
+                    <td class="font-bold text-white">{{ item.productName }}</td>
+                    <td class="font-mono text-mustard">{{ item.quantity }}</td>
+                    <td class="font-mono text-dim">₹{{ item.unitPrice | number:'1.2-2' }}</td>
+                    <td class="font-mono font-bold text-mustard" style="text-align: right;">₹{{ item.totalPrice | number:'1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top: 14px; text-align: right; font-size: 16px; font-weight: 800; color: var(--mustard-2);">
+            Total Order Amount: ₹{{ selectedViewOrder.totalAmount | number:'1.2-2' }}
+          </div>
+        } @else {
+          <p style="font-size: 13px; color: var(--text-dim);">No product details found for this order.</p>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" (click)="closeViewOrderModal()">Close</button>
+      </div>
+    </div>
+  </div>
+}

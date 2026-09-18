@@ -1,0 +1,223 @@
+<div class="quick-order-page">
+  <div class="wrap">
+    <!-- Sticky Filter & Category Jump Bar -->
+    <div class="qo-control-bar">
+      <div class="qo-search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input 
+          type="text" 
+          [ngModel]="searchQuery()" 
+          (ngModelChange)="searchQuery.set($event)" 
+          placeholder="Search products by name or code (e.g. 1, 2, sparklers)..."
+        />
+        @if (searchQuery()) {
+          <button (click)="searchQuery.set('')" class="clear-search-btn">✕</button>
+        }
+      </div>
+
+      <div class="qo-filter-actions">
+        <label class="toggle-selected-label">
+          <input 
+            type="checkbox" 
+            [ngModel]="onlySelected()" 
+            (ngModelChange)="onlySelected.set($event)" 
+          />
+          <span>Show Added Items Only ({{ totalSelectedItemsCount() }})</span>
+        </label>
+        <button (click)="downloadPriceListPdf()" class="btn btn-price-pdf btn-sm">
+          📄 Download PDF Price List
+        </button>
+        @if (cartService.cartCount() > 0) {
+          <button (click)="resetAllQuantities()" class="btn-reset-cart">
+            Clear All Quantities
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Category Quick Jump Scroll Pills -->
+    <div class="qo-cat-pills-bar">
+      <button 
+        [class.active]="selectedCatId() === 'all'" 
+        (click)="scrollToCategory('all')" 
+        class="cat-pill"
+      >
+        🌟 All Categories ({{ products().length }})
+      </button>
+      @for (cat of categories(); track cat.id) {
+        <button 
+          [class.active]="selectedCatId() === cat.id" 
+          (click)="scrollToCategory(cat.id)" 
+          class="cat-pill"
+        >
+          <span [innerHTML]="getCategoryIcon(cat.name)" class="pill-icon"></span>
+          {{ cat.name }} ({{ cat.count }})
+        </button>
+      }
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="qo-loading">
+        <div class="spinner"></div>
+        <p>Loading full Sivakasi product price list...</p>
+      </div>
+    } @else {
+      <!-- Empty State -->
+      @if (groupedCategoryList().length === 0) {
+        <div class="qo-empty">
+          <div class="empty-icon">🔍</div>
+          <h3>No products match your search</h3>
+          <p>Try searching for a different product name, item code, or clear your filters.</p>
+          <button (click)="searchQuery.set(''); selectedCatId.set('all'); onlySelected.set(false);" class="btn btn-primary" style="margin-top: 14px;">
+            Reset Search Filters
+          </button>
+        </div>
+      } @else {
+        <!-- Product Sheet Grouped by Category -->
+        <div class="qo-sheet-container">
+          @for (group of groupedCategoryList(); track group.name) {
+            <div [id]="'cat-sec-' + group.id" class="qo-cat-block">
+              <!-- Category Header Bar -->
+              <div class="qo-cat-header">
+                <div class="qo-cat-title">
+                  <span [innerHTML]="getCategoryIcon(group.name)" class="cat-svg"></span>
+                  <h2>{{ group.name }}</h2>
+                  <span class="qo-cat-count-badge">{{ group.products.length }} Items</span>
+                </div>
+                <button (click)="scrollToTop()" class="qo-jump-top-btn" title="Back to top">
+                  ↑ Top
+                </button>
+              </div>
+
+              <!-- Product Table -->
+              <div class="qo-table-responsive">
+                <table class="qo-table">
+                  <thead>
+                    <tr>
+                      <th class="th-num">#</th>
+                      <th class="th-code">Code</th>
+                      <th class="th-desc">Product Description & Packaging</th>
+                      <th class="th-mrp">MRP</th>
+                      <th class="th-offer">Offer Price</th>
+                      <th class="th-qty">Quantity</th>
+                      <th class="th-total">Total Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (p of group.products; track p.code; let idx = $index) {
+                      @let qty = getItemQty(p.code);
+                      <tr [class.row-selected]="qty > 0">
+                        <td class="td-num">{{ idx + 1 }}</td>
+                        <td class="td-code"><span class="code-badge">[{{ p.code }}]</span></td>
+                        <td class="td-desc">
+                          <div class="prod-row-info">
+                            <a [routerLink]="['/detail', p.code]" class="prod-title-link">{{ p.name }}</a>
+                            <div class="prod-meta">
+                              <span class="prod-unit">📦 {{ p.unit }}</span>
+                              @if (p.badge) {
+                                <span class="prod-discount-badge">{{ p.badge }}</span>
+                              }
+                            </div>
+                          </div>
+                        </td>
+                        <td class="td-mrp">
+                          @if (p.mrpPrice && p.mrpPrice > p.price) {
+                            <span class="mrp-old">{{ formatPrice(p.mrpPrice) }}</span>
+                          } @else {
+                            <span class="mrp-old">{{ formatPrice(p.price * 2.22) }}</span>
+                          }
+                        </td>
+                        <td class="td-offer">
+                          <b class="offer-price">{{ formatPrice(p.price) }}</b>
+                        </td>
+                        <td class="td-qty">
+                          <div class="qo-qty-control">
+                            <button 
+                              type="button" 
+                              (click)="decrementQty(p.code)" 
+                              class="qty-btn qty-minus" 
+                              [disabled]="qty <= 0"
+                              aria-label="Decrease quantity"
+                            >-</button>
+                            <input 
+                              type="number" 
+                              min="0" 
+                              [ngModel]="qty" 
+                              (ngModelChange)="updateQty(p.code, $event)" 
+                              class="qty-input"
+                            />
+                            <button 
+                              type="button" 
+                              (click)="incrementQty(p.code)" 
+                              class="qty-btn qty-plus" 
+                              aria-label="Increase quantity"
+                            >+</button>
+                          </div>
+                        </td>
+                        <td class="td-total">
+                          <b class="line-total" [class.active]="qty > 0">
+                            {{ formatPrice(p.price * qty) }}
+                          </b>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Sticky Bottom Summary Floating Bar -->
+  <div class="qo-bottom-bar" [class.has-items]="cartService.cartCount() > 0">
+    <div class="wrap qo-bottom-wrap">
+      <div class="qo-summary-info">
+        <div class="sum-items-count">
+          <span class="badge-count">{{ totalSelectedItemsCount() }}</span>
+          <b>Items Selected</b>
+          <span class="sum-total-qty">({{ cartService.cartCount() }} Total Boxes)</span>
+        </div>
+        <div class="sum-total-price">
+          <span class="lbl">Net Bill Total:</span>
+          <b class="price-val">{{ formatPrice(cartService.cartTotal()) }}</b>
+        </div>
+      </div>
+
+      <!-- Minimum Order Progress -->
+      <div class="qo-min-order-box">
+        @if (cartService.isMinimumOrderMet()) {
+          <div class="min-order-status met">
+            <span>✅ Minimum order limit of ₹2,500 met!</span>
+          </div>
+        } @else {
+          <div class="min-order-status unmet">
+            <span>⚠️ Min order is <b>₹2,500</b>. Add <b>{{ formatPrice(cartService.minOrderShortfall()) }}</b> more</span>
+            <div class="min-order-bar">
+              <div class="bar-fill" [style.width.%]="(cartService.cartTotal() / 2500) * 100"></div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="qo-bottom-actions">
+        <button (click)="downloadPriceListPdf()" class="btn btn-price-pdf btn-sm hide-mobile">
+          📄 Download PDF
+        </button>
+        <a routerLink="/cart" class="btn btn-ghost btn-sm">
+          🛒 View Cart ({{ cartService.cartCount() }})
+        </a>
+        <a 
+          routerLink="/checkout" 
+          class="btn btn-primary" 
+          [class.disabled]="!cartService.isMinimumOrderMet()"
+        >
+          💳 Checkout ({{ formatPrice(cartService.cartTotal()) }}) →
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

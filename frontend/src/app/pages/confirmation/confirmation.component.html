@@ -1,0 +1,99 @@
+<div class="wrap">
+  <div class="confirm-wrap">
+    <div class="confirm-card" [class.play]="isPlayingAnimation">
+      <div class="confirm-ring">
+        <svg viewBox="0 0 84 84">
+          <circle class="ring" cx="42" cy="42" r="36"/>
+          <path class="tick" d="M27 43 L37 53 L58 30"/>
+        </svg>
+      </div>
+      <h1>Order placed successfully!</h1>
+      <p class="sub">Your order #<strong>{{ order?.orderId }}</strong> has been registered. Please complete your payment using the UPI QR Code below.</p>
+      <div class="order-id">{{ order?.orderId }}</div>
+
+      <!-- PROMINENT UPI QR PAYMENT CARD -->
+      <div class="upi-payment-card" style="margin-top: 24px; background: linear-gradient(135deg, rgba(230, 81, 0, 0.12), rgba(18, 14, 10, 0.95)); border: 2px solid var(--mustard-2); border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 22px;">💳</span>
+          <h3 style="margin: 0; color: var(--mustard-2); font-size: 18px; font-weight: 700; letter-spacing: 0.5px;">SCAN & PAY VIA UPI</h3>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-dim); margin-bottom: 16px;">
+          Scan with GPay, PhonePe, PayTM, or BHIM app to pay <strong>{{ formatPrice(order?.totalAmount || 0) }}</strong>
+        </p>
+
+        <!-- QR CODE IMAGE DISPLAY -->
+        <div style="background: #ffffff; padding: 14px; border-radius: 12px; display: inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 16px;">
+          <img [src]="upiQrCodeUrl" alt="Karthick Crackers UPI Payment QR Code" style="width: 210px; height: 210px; object-fit: contain; display: block; border-radius: 6px;">
+        </div>
+
+        <!-- UPI ID WITH ONE-CLICK COPY -->
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); font-weight: 600;">Official Store UPI ID</span>
+          <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.4); border: 1px dashed var(--mustard-2); padding: 8px 16px; border-radius: 30px;">
+            <strong style="color: #ffffff; font-size: 16px; font-family: monospace; letter-spacing: 0.5px;">{{ upiId }}</strong>
+            <button (click)="copyUpiId()" type="button" style="background: var(--mustard-2); color: #000; border: none; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
+              {{ copiedUpi ? '✓ Copied!' : 'Copy' }}
+            </button>
+          </div>
+          <span style="font-size: 12px; color: var(--text-dim); margin-top: 4px;">Or call and confirm the payment mode through <strong>{{ callNumber }}</strong></span>
+        </div>
+      </div>
+
+      <div class="confirm-facts" style="margin-top: 20px;">
+        <div class="row"><span>Customer name</span><span>{{ order?.customerName }}</span></div>
+        <div class="row"><span>Mobile number</span><span>+91 {{ order?.mobile }}</span></div>
+        <div class="row"><span>Delivery to</span><span>{{ order?.address }}, {{ order?.city }} — {{ order?.pincode }}</span></div>
+        <div class="row"><span>Payment Policy</span><span style="color: var(--mustard-2); font-weight: 700;">💳 UPI ONLY (No COD)</span></div>
+        <div class="row"><span>Total Net Amount</span><b>{{ formatPrice(order?.totalAmount || 0) }}</b></div>
+      </div>
+
+      <!-- Itemized Raw Bill Table -->
+      @if (order?.items && (order?.items)!.length > 0) {
+        <div class="itemized-bill-box" style="margin-top: 24px; text-align: left; background: rgba(18, 14, 10, 0.7); border: 1px solid var(--line); border-radius: var(--radius-m); padding: 18px;">
+          <h4 style="margin-top: 0; margin-bottom: 12px; color: var(--mustard-2); font-size: 15px;">📦 Itemized Order Bill Breakdown</h4>
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--line); text-align: left; color: var(--text-dim);">
+                <th style="padding: 6px 0;">Item</th>
+                <th style="padding: 6px 8px; text-align: center;">Qty</th>
+                <th style="padding: 6px 0; text-align: right;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of order?.items; track item.product.code) {
+                <tr style="border-bottom: 1px solid rgba(229, 169, 60, 0.1);">
+                  <td style="padding: 8px 0;">
+                    <strong style="color: var(--mustard-2);">[{{ item.product.code }}]</strong> {{ item.product.name }}
+                  </td>
+                  <td style="padding: 8px 8px; text-align: center; font-weight: 700;">x{{ item.qty }}</td>
+                  <td style="padding: 8px 0; text-align: right; font-weight: 700;">{{ formatPrice(item.lineTotal) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <div class="confirm-steps" style="margin-top: 24px;">
+        <h5>Important Order & Payment Instructions</h5>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><strong>💳 Strict UPI Payment Policy:</strong> Scan the QR code or send payment to UPI ID <strong>{{ upiId }}</strong> or call and confirm the payment mode through <strong>{{ callNumber }}</strong> (GPay / PhonePe / PayTM / BHIM). No Cash on Delivery (COD).</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><strong>📱 Share Screenshot:</strong> After payment, send your transaction screenshot on WhatsApp for instant confirmation.</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><strong>📄 Official Order Bill:</strong> Download your PDF bill anytime using the button below for records and payment confirmation.</li>
+        </ul>
+      </div>
+
+      <!-- Quick PDF Action -->
+      <div style="margin-top: 28px; display: flex; flex-direction: column; gap: 10px; width: 100%;">
+        <a [href]="getPdfInvoiceUrl()" target="_blank" class="btn btn-price-pdf btn-block" style="font-size: 14px; padding: 12px 20px; justify-content: center; width: 100%; box-sizing: border-box;">
+          📄 Download Official Order PDF Bill
+        </a>
+      </div>
+
+      <div class="confirm-actions" style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a routerLink="/listing" class="btn btn-ghost">Continue shopping</a>
+        <a routerLink="/home" class="btn btn-primary">Back to home</a>
+      </div>
+    </div>
+  </div>
+</div>

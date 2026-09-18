@@ -1,0 +1,478 @@
+<div class="admin-page-wrapper">
+  <app-admin-sidebar></app-admin-sidebar>
+
+  <main class="admin-main-content">
+    <header class="admin-topbar">
+      <div>
+        <h1 class="admin-page-title">Product Management</h1>
+        <p class="admin-page-subtitle">Manage catalog products, bulk Excel import, inventory stock, and pricing discounts</p>
+      </div>
+
+      <div class="admin-topbar-actions">
+        <button (click)="openImportModal()" class="btn btn-ghost btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 15px; height: 15px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>Excel Upload</span>
+        </button>
+
+        <button (click)="openAddModal()" class="btn btn-primary btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 15px; height: 15px;">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Product</span>
+        </button>
+      </div>
+    </header>
+
+    @if (successMessage) {
+      <div class="admin-success-banner">
+        <span>{{ successMessage }}</span>
+      </div>
+    }
+
+    @if (errorMessage) {
+      <div class="admin-error-banner">
+        <div class="error-text">{{ errorMessage }}</div>
+        <button (click)="loadProducts()" class="btn btn-primary btn-sm">Try Again</button>
+      </div>
+    }
+
+    <!-- Filter & Search Toolbar -->
+    <section class="admin-section-card filter-toolbar">
+      <div class="toolbar-grid">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="text" 
+            [(ngModel)]="searchTerm" 
+            (ngModelChange)="onSearchOrFilterChange()" 
+            placeholder="Search products by code or name..." 
+            class="admin-input"
+          />
+        </div>
+
+        <div class="select-box">
+          <select [(ngModel)]="selectedCategoryId" (change)="onSearchOrFilterChange()" class="admin-select">
+            <option [ngValue]="0">All Categories</option>
+            @for (cat of categories; track cat.categoryId) {
+              <option [ngValue]="cat.categoryId">{{ cat.categoryName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="total-badge">
+          <span>Total Products: <b>{{ products.length }}</b></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Table -->
+    @if (isLoading) {
+      <div class="admin-loading-state">
+        <div class="spinner"></div>
+        <p>Loading products catalog...</p>
+      </div>
+    } @else {
+      <section class="admin-section-card">
+        @if (products.length > 0) {
+          <div class="table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Code</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>MRP Price</th>
+                  <th>Discount %</th>
+                  <th>Selling Price</th>
+                  <th>Quantity</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (prod of pagedProducts; track prod.productId) {
+                  <tr>
+                    <td>
+                      <div class="table-img-box">
+                        <img [src]="prod.imageUrl || '/assets/images/sparklers.jpg'" [alt]="prod.productName" />
+                      </div>
+                    </td>
+                    <td class="font-mono font-bold text-gold">{{ prod.productCode }}</td>
+                    <td class="font-medium text-white">{{ prod.productName }}</td>
+                    <td><span class="category-pill">{{ prod.categoryName }}</span></td>
+                    <td class="font-mono text-dim">₹{{ prod.mrpPrice | number:'1.2-2' }}</td>
+                    <td class="font-mono text-gold">{{ prod.discountPercentage }}%</td>
+                    <td class="font-mono font-bold text-mustard">₹{{ prod.discountPrice | number:'1.2-2' }}</td>
+                    <td>
+                      @if (prod.totalQuantity > 0) {
+                        <span class="qty-badge qty-ok">{{ prod.totalQuantity }}</span>
+                      } @else {
+                        <span class="qty-badge qty-zero">0 (Out of Stock)</span>
+                      }
+                    </td>
+                    <td>
+                      @if (prod.isActive && prod.isAvailable) {
+                        <span class="status-pill status-active">Active</span>
+                      } @else {
+                        <span class="status-pill status-inactive">Inactive</span>
+                      }
+                    </td>
+                    <td style="text-align: right;">
+                      <div class="table-actions">
+                        <button (click)="openViewModal(prod)" class="icon-btn-sm" title="View Product">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                          </svg>
+                        </button>
+                        <button (click)="openEditModal(prod)" class="icon-btn-sm btn-edit" title="Edit Product">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          </svg>
+                        </button>
+                        <button (click)="deleteProduct(prod)" class="icon-btn-sm btn-delete" title="Deactivate Product">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div style="padding: 16px 24px; border-top: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="font-size: 13px; color: var(--text-dim); display: flex; align-items: center; gap: 12px;">
+              <span>Showing {{ (page - 1) * pageSize + 1 }} to {{ page * pageSize > products.length ? products.length : page * pageSize }} of {{ products.length }} products</span>
+              <span>·</span>
+              <span style="display: flex; align-items: center; gap: 6px;">
+                Rows per page:
+                <select class="admin-input" style="width: 70px; height: 32px; font-size: 12px;" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+                  <option [value]="10">10</option>
+                  <option [value]="25">25</option>
+                  <option [value]="50">50</option>
+                </select>
+              </span>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="btn btn-ghost btn-sm" [disabled]="page <= 1" (click)="goToPage(page - 1)">Previous</button>
+              <span style="font-size: 13px; color: var(--mustard-2); font-weight: 700; padding: 0 8px;">Page {{ page }} of {{ totalPages }}</span>
+              <button class="btn btn-ghost btn-sm" [disabled]="page >= totalPages" (click)="goToPage(page + 1)">Next</button>
+            </div>
+          </div>
+        } @else {
+          <div class="empty-state font-dim">
+            No products found matching your search criteria.
+          </div>
+        }
+      </section>
+    }
+  </main>
+</div>
+
+<!-- ============================================================
+     1. ADD / EDIT PRODUCT MODAL
+     ============================================================ -->
+@if (isAddEditModalOpen) {
+  <div class="modal-overlay">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h2>{{ isEditMode ? 'Edit Product' : 'Add New Product' }}</h2>
+        <button (click)="closeAddEditModal()" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <form (ngSubmit)="saveProduct()">
+          <div class="form-grid">
+            <!-- Product Code -->
+            <div class="form-group">
+              <label>Product Code *</label>
+              <input type="text" [(ngModel)]="formData.productCode" name="productCode" required class="admin-input" placeholder="e.g. 1" />
+            </div>
+
+            <!-- Product Name -->
+            <div class="form-group">
+              <label>Product Name *</label>
+              <input type="text" [(ngModel)]="formData.productName" name="productName" required class="admin-input" placeholder="e.g. 30-Shot Multi Color Aerial" />
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+              <label>Category *</label>
+              <select [(ngModel)]="formData.categoryId" name="categoryId" required class="admin-select">
+                @for (cat of categories; track cat.categoryId) {
+                  <option [ngValue]="cat.categoryId">{{ cat.categoryName }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Unit -->
+            <div class="form-group">
+              <label>Unit / Packing</label>
+              <input type="text" [(ngModel)]="formData.unit" name="unit" class="admin-input" placeholder="e.g. 1 Box (10 Pcs)" />
+            </div>
+
+            <!-- MRP Price -->
+            <div class="form-group">
+              <label>MRP Price (₹) *</label>
+              <input 
+                type="number" 
+                [(ngModel)]="formData.mrpPrice" 
+                (ngModelChange)="onPriceOrDiscountChange()" 
+                name="mrpPrice" 
+                min="0" 
+                step="0.01" 
+                required 
+                class="admin-input"
+              />
+            </div>
+
+            <!-- Discount Percentage -->
+            <div class="form-group">
+              <label>Discount Percentage (%) *</label>
+              <input 
+                type="number" 
+                [(ngModel)]="formData.discountPercentage" 
+                (ngModelChange)="onPriceOrDiscountChange()" 
+                name="discountPercentage" 
+                min="0" 
+                max="100" 
+                step="0.1" 
+                required 
+                class="admin-input"
+              />
+            </div>
+
+            <!-- Calculated Discount Price (Read-only Auto-calculated) -->
+            <div class="form-group full-width">
+              <div class="calculated-price-box">
+                <span class="calc-label">Calculated Selling Price (Discount Price):</span>
+                <span class="calc-value font-mono">₹{{ calculatedDiscountPrice | number:'1.2-2' }}</span>
+                <span class="calc-formula">(Formula: MRP ₹{{ formData.mrpPrice }} - {{ formData.discountPercentage }}%)</span>
+              </div>
+            </div>
+
+            <!-- Total Quantity -->
+            <div class="form-group">
+              <label>Total Stock Quantity *</label>
+              <input type="number" [(ngModel)]="formData.totalQuantity" name="totalQuantity" min="0" required class="admin-input" />
+              <small class="form-help">Products with 0 quantity are hidden from customers.</small>
+            </div>
+
+            <!-- Image URL -->
+            <div class="form-group">
+              <label>Image URL</label>
+              <input type="text" [(ngModel)]="formData.imageUrl" name="imageUrl" class="admin-input" placeholder="/assets/images/sparklers.jpg" />
+            </div>
+
+            <!-- Description -->
+            <div class="form-group full-width">
+              <label>Description</label>
+              <textarea [(ngModel)]="formData.description" name="description" rows="3" class="admin-textarea" placeholder="Product details, specs, safety instructions..."></textarea>
+            </div>
+
+            <!-- Toggles -->
+            <div class="form-group full-width checkbox-row">
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="formData.isAvailable" name="isAvailable" />
+                <span>Is Available</span>
+              </label>
+
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="formData.isActive" name="isActive" />
+                <span>Is Active</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" (click)="closeAddEditModal()" class="btn btn-ghost btn-sm">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm">
+              <span>{{ isEditMode ? 'Update Product' : 'Save Product' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ============================================================
+     2. VIEW PRODUCT MODAL
+     ============================================================ -->
+@if (isViewModalOpen && viewingProduct) {
+  <div class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Product Details</h2>
+        <button (click)="closeViewModal()" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="view-product-card">
+          <div class="view-media">
+            <img [src]="viewingProduct.imageUrl || '/assets/images/sparklers.jpg'" [alt]="viewingProduct.productName" />
+          </div>
+
+          <div class="view-info">
+            <span class="font-mono text-gold font-bold">{{ viewingProduct.productCode }}</span>
+            <h3 class="view-title">{{ viewingProduct.productName }}</h3>
+            <span class="category-pill">{{ viewingProduct.categoryName }}</span>
+
+            <div class="pricing-summary-box">
+              <div class="price-row">
+                <span class="p-label">Original MRP:</span>
+                <span class="p-mrp font-mono">₹{{ viewingProduct.mrpPrice | number:'1.2-2' }}</span>
+              </div>
+              <div class="price-row">
+                <span class="p-label">Discount:</span>
+                <span class="p-disc font-mono text-gold">{{ viewingProduct.discountPercentage }}% OFF</span>
+              </div>
+              <div class="price-row total-row">
+                <span class="p-label">Final Selling Price:</span>
+                <span class="p-final font-mono text-mustard">₹{{ viewingProduct.discountPrice | number:'1.2-2' }}</span>
+              </div>
+            </div>
+
+            <div class="view-meta">
+              <div class="meta-item">
+                <span class="m-label">Stock Quantity:</span>
+                <span class="m-val font-mono" [class.text-danger]="viewingProduct.totalQuantity === 0">{{ viewingProduct.totalQuantity }} Pcs</span>
+              </div>
+              <div class="meta-item">
+                <span class="m-label">Packing Unit:</span>
+                <span class="m-val">{{ viewingProduct.unit || '1 Box' }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="m-label">Status:</span>
+                <span class="m-val">{{ viewingProduct.isActive && viewingProduct.isAvailable ? 'Active & Available' : 'Inactive / Unavailable' }}</span>
+              </div>
+            </div>
+
+            @if (viewingProduct.description) {
+              <div class="view-desc">
+                <p>{{ viewingProduct.description }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button (click)="closeViewModal()" class="btn btn-primary btn-sm">Close</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ============================================================
+     3. EXCEL / CSV BULK IMPORT MODAL
+     ============================================================ -->
+@if (isImportModalOpen) {
+  <div class="modal-overlay">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h2>Excel / CSV Bulk Product Import</h2>
+        <button (click)="closeImportModal()" class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-intro">Upload a CSV or Excel file containing products data to perform bulk catalog updates.</p>
+
+        <div class="import-actions-row">
+          <button (click)="downloadSampleCsv()" class="btn btn-ghost btn-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download CSV Template</span>
+          </button>
+        </div>
+
+        <div class="file-dropzone">
+          <input type="file" (change)="onFileSelected($event)" accept=".csv, .xlsx, .xls" id="excelFile" class="file-input" />
+          <label for="excelFile" class="dropzone-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            @if (selectedFile) {
+              <span class="selected-file-name">{{ selectedFile.name }} ({{ (selectedFile.size / 1024) | number:'1.0-1' }} KB)</span>
+            } @else {
+              <span>Click or drag your CSV/Excel file here</span>
+            }
+          </label>
+        </div>
+
+        @if (isUploading) {
+          <div class="admin-loading-state" style="padding: 30px 0;">
+            <div class="spinner"></div>
+            <p>Processing bulk file import & validating records...</p>
+          </div>
+        }
+
+        @if (importResult) {
+          <div class="import-result-summary">
+            <h3>Import Summary</h3>
+            <div class="stats-row">
+              <div class="res-stat"><span class="lbl">Total Records:</span> <b>{{ importResult.totalRecords }}</b></div>
+              <div class="res-stat text-emerald"><span class="lbl">Successfully Imported:</span> <b>{{ importResult.successfullyImported }}</b></div>
+              <div class="res-stat text-danger"><span class="lbl">Failed:</span> <b>{{ importResult.failedCount }}</b></div>
+            </div>
+
+            @if (importResult.failedRecords && importResult.failedRecords.length > 0) {
+              <div class="failed-table-wrapper">
+                <h4>Failed Records Detail</h4>
+                <table class="admin-table failed-table">
+                  <thead>
+                    <tr>
+                      <th>Row</th>
+                      <th>Code</th>
+                      <th>Product Name</th>
+                      <th>Failure Reason</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (err of importResult.failedRecords; track err.rowNumber) {
+                      <tr>
+                        <td class="font-mono">{{ err.rowNumber }}</td>
+                        <td class="font-mono text-gold">{{ err.productCode || 'N/A' }}</td>
+                        <td>{{ err.productName || 'N/A' }}</td>
+                        <td class="text-danger">{{ err.reason }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer">
+        <button (click)="closeImportModal()" class="btn btn-ghost btn-sm">Close</button>
+        <button (click)="uploadFile()" class="btn btn-primary btn-sm" [disabled]="!selectedFile || isUploading">
+          <span>Upload & Import</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}

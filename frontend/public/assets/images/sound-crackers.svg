@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <radialGradient id="soundGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFF"/>
+      <stop offset="40%" stop-color="#E5A93C"/>
+      <stop offset="100%" stop-color="#14120E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="redCracker" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C0392B"/>
+      <stop offset="50%" stop-color="#E74C3C"/>
+      <stop offset="100%" stop-color="#922B21"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="#14120E"/>
+  <circle cx="200" cy="150" r="110" fill="url(#soundGlow)"/>
+
+  <!-- Roll of Red Bijili Crackers -->
+  <g transform="translate(70, 70)">
+    <!-- Main String Thread -->
+    <path d="M 30 70 Q 130 20 230 70 T 260 130" stroke="#F5C242" stroke-width="4" fill="none"/>
+
+    <!-- Red Crackers String Array -->
+    <rect x="40" y="60" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+    <rect x="60" y="50" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+    <rect x="80" y="45" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+    <rect x="100" y="40" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+    <rect x="120" y="42" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+    <rect x="140" y="48" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+    <rect x="160" y="55" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+    <rect x="180" y="65" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+    <rect x="200" y="80" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+    <rect x="220" y="98" width="12" height="40" rx="2" fill="url(#redCracker)" stroke="#F5C242"/>
+  </g>
+
+  <!-- Atom Bomb Box -->
+  <rect x="240" y="150" width="110" height="90" rx="6" fill="#191611" stroke="#F5C242" stroke-width="2"/>
+  <rect x="250" y="160" width="90" height="70" rx="4" fill="#C0392B"/>
+  <text x="295" y="195" font-family="sans-serif" font-weight="900" font-size="14" fill="#FFF" text-anchor="middle">ATOM BOMB</text>
+
+  <text x="200" y="275" font-family="sans-serif" font-weight="900" font-size="18" fill="#F5C242" text-anchor="middle">BIJILI &amp; SOUND CRACKERS</text>
+</svg>

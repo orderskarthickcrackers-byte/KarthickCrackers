@@ -1,0 +1,13 @@
+<div id="frame-outer" [class.admin-layout]="isAdminRoute()">
+  <div id="viewport" [class.admin-viewport]="isAdminRoute()">
+    <div class="phone-chrome" *ngIf="!isAdminRoute()"><span>9:41</span><span>●●● ▲ ■</span></div>
+    <app-header *ngIf="!isAdminRoute()"></app-header>
+    <main [class.admin-main]="isAdminRoute()">
+      <router-outlet></router-outlet>
+    </main>
+    <app-footer *ngIf="!isAdminRoute()"></app-footer>
+  </div>
+</div>
+<app-floating-contact *ngIf="!isAdminRoute()"></app-floating-contact>
+<app-toast></app-toast>
+
