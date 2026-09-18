@@ -129,7 +129,19 @@ namespace KarthickCrackers.Api.Data
                       AND t.name IN ('int', 'bigint', 'smallint', 'tinyint')
                 )
                 BEGIN
+                    DECLARE @ConstraintName nvarchar(200);
+                    SELECT @ConstraintName = d.name
+                    FROM sys.default_constraints d
+                    JOIN sys.columns c ON d.parent_object_id = c.object_id AND d.parent_column_id = c.column_id
+                    WHERE d.parent_object_id = OBJECT_ID('Products') AND c.name = 'DiscountPercentage';
+
+                    IF @ConstraintName IS NOT NULL
+                    BEGIN
+                        EXEC('ALTER TABLE [Products] DROP CONSTRAINT [' + @ConstraintName + ']');
+                    END
+
                     ALTER TABLE [Products] ALTER COLUMN [DiscountPercentage] decimal(18,2) NOT NULL;
+                    ALTER TABLE [Products] ADD CONSTRAINT [DF_Products_DiscountPercentage] DEFAULT 0 FOR [DiscountPercentage];
                 END
 
                 -- Automatically clean up any existing KC- or KHC- product code prefixes in the database
