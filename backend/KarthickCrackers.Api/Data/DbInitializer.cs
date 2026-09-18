@@ -214,6 +214,15 @@ namespace KarthickCrackers.Api.Data
                     );
                 END
 
+                -- Ensure HistoryId is renamed to OrderStatusHistoryId if created by legacy import script
+                IF EXISTS (
+                    SELECT * FROM sys.columns 
+                    WHERE object_id = OBJECT_ID('OrderStatusHistories') AND name = 'HistoryId'
+                )
+                BEGIN
+                    EXEC sp_rename 'OrderStatusHistories.HistoryId', 'OrderStatusHistoryId', 'COLUMN';
+                END
+
                 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PaymentSettings')
                 BEGIN
                     CREATE TABLE [PaymentSettings] (

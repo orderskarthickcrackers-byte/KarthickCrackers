@@ -114,13 +114,13 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OrderStatusHistories]') AND type in (N'U'))
 BEGIN
     CREATE TABLE [dbo].[OrderStatusHistories] (
-        [HistoryId] INT IDENTITY(1,1) NOT NULL,
+        [OrderStatusHistoryId] INT IDENTITY(1,1) NOT NULL,
         [OrderId] INT NOT NULL,
         [OldStatus] NVARCHAR(50) NULL,
         [NewStatus] NVARCHAR(50) NOT NULL,
         [ChangedDate] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
         [Remarks] NVARCHAR(MAX) NULL,
-        CONSTRAINT [PK_OrderStatusHistories] PRIMARY KEY CLUSTERED ([HistoryId] ASC),
+        CONSTRAINT [PK_OrderStatusHistories] PRIMARY KEY CLUSTERED ([OrderStatusHistoryId] ASC),
         CONSTRAINT [FK_OrderStatusHistories_Orders] FOREIGN KEY ([OrderId]) REFERENCES [dbo].[Orders] ([OrderId]) ON DELETE CASCADE
     );
 END

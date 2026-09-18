@@ -38,198 +38,205 @@ namespace KarthickCrackers.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto dto)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
-
-            if (dto.Items == null || !dto.Items.Any())
-            {
-                return BadRequest(new { message = "Cart items cannot be empty." });
-            }
-
-            // 1. Fetch Product details from DB
-            var productIds = dto.Items.Select(i => i.ProductId).Distinct().ToList();
-            var products = await _dbContext.Products
-                .Where(p => productIds.Contains(p.ProductId))
-                .ToDictionaryAsync(p => p.ProductId);
-
-            decimal subtotal = 0;
-            var orderItems = new List<OrderItem>();
-
-            foreach (var item in dto.Items)
-            {
-                if (!products.TryGetValue(item.ProductId, out var product))
+                if (!ModelState.IsValid)
                 {
-                    return BadRequest(new { message = $"Product ID {item.ProductId} not found." });
+                    return BadRequest(ModelState);
                 }
 
-                if (item.Quantity <= 0)
+                if (dto.Items == null || !dto.Items.Any())
                 {
-                    return BadRequest(new { message = $"Invalid quantity for product {product.ProductName}." });
+                    return BadRequest(new { message = "Cart items cannot be empty." });
                 }
 
-                decimal lineTotal = product.Price * item.Quantity;
-                subtotal += lineTotal;
+                // 1. Fetch Product details from DB
+                var productIds = dto.Items.Select(i => i.ProductId).Distinct().ToList();
+                var products = await _dbContext.Products
+                    .Where(p => productIds.Contains(p.ProductId))
+                    .ToDictionaryAsync(p => p.ProductId);
 
-                orderItems.Add(new OrderItem
+                decimal subtotal = 0;
+                var orderItems = new List<OrderItem>();
+
+                foreach (var item in dto.Items)
                 {
-                    ProductId = product.ProductId,
-                    ProductName = product.ProductName,
-                    ProductCode = product.ProductCode,
-                    Quantity = item.Quantity,
-                    UnitPrice = product.Price,
-                    TotalPrice = lineTotal
-                });
-            }
+                    if (!products.TryGetValue(item.ProductId, out var product))
+                    {
+                        return BadRequest(new { message = $"Product ID {item.ProductId} not found." });
+                    }
 
-            // 2. Minimum Order Amount Validation (₹2500)
-            if (subtotal < 2500.00m)
-            {
-                return BadRequest(new { message = "Minimum order amount is ₹2,500. Please add more items to place your order." });
-            }
+                    if (item.Quantity <= 0)
+                    {
+                        return BadRequest(new { message = $"Invalid quantity for product {product.ProductName}." });
+                    }
 
-            // 3. Find or Create Customer by Mobile Number
-            var mobileClean = dto.MobileNumber.Trim();
-            var customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.MobileNumber == mobileClean);
+                    decimal lineTotal = product.Price * item.Quantity;
+                    subtotal += lineTotal;
 
-            if (customer == null)
-            {
-                customer = new Customer
+                    orderItems.Add(new OrderItem
+                    {
+                        ProductId = product.ProductId,
+                        ProductName = product.ProductName,
+                        ProductCode = product.ProductCode,
+                        Quantity = item.Quantity,
+                        UnitPrice = product.Price,
+                        TotalPrice = lineTotal
+                    });
+                }
+
+                // 2. Minimum Order Amount Validation (₹2500)
+                if (subtotal < 2500.00m)
                 {
-                    FullName = dto.CustomerName.Trim(),
-                    MobileNumber = mobileClean,
-                    Email = dto.Email?.Trim(),
-                    Address = dto.Address.Trim(),
-                    City = dto.City.Trim(),
-                    Pincode = dto.Pincode.Trim(),
-                    Remarks = dto.Remarks?.Trim(),
+                    return BadRequest(new { message = "Minimum order amount is ₹2,500. Please add more items to place your order." });
+                }
+
+                // 3. Find or Create Customer by Mobile Number
+                var mobileClean = dto.MobileNumber.Trim();
+                var customer = await _dbContext.Customers.FirstOrDefaultAsync(c => c.MobileNumber == mobileClean);
+
+                if (customer == null)
+                {
+                    customer = new Customer
+                    {
+                        FullName = dto.CustomerName.Trim(),
+                        MobileNumber = mobileClean,
+                        Email = dto.Email?.Trim(),
+                        Address = dto.Address.Trim(),
+                        City = dto.City.Trim(),
+                        Pincode = dto.Pincode.Trim(),
+                        Remarks = dto.Remarks?.Trim(),
+                        CreatedDate = DateTime.UtcNow
+                    };
+                    _dbContext.Customers.Add(customer);
+                    await _dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    // Update customer profile details if changed
+                    customer.FullName = dto.CustomerName.Trim();
+                    customer.Address = dto.Address.Trim();
+                    customer.City = dto.City.Trim();
+                    customer.Pincode = dto.Pincode.Trim();
+                    if (!string.IsNullOrWhiteSpace(dto.Email)) customer.Email = dto.Email.Trim();
+                    customer.ModifiedDate = DateTime.UtcNow;
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                // 4. Create Order with Sequential Invoice Number (e.g. KC10008, KC10009...)
+                var lastOrderNumber = await _dbContext.Orders
+                    .OrderByDescending(o => o.OrderId)
+                    .Select(o => o.OrderNumber)
+                    .FirstOrDefaultAsync();
+
+                int nextSeq = 10001;
+                if (!string.IsNullOrEmpty(lastOrderNumber))
+                {
+                    var digits = new string(lastOrderNumber.Where(char.IsDigit).ToArray());
+                    if (int.TryParse(digits, out int currentSeq) && currentSeq >= 10000)
+                    {
+                        nextSeq = currentSeq + 1;
+                    }
+                }
+
+                var orderNumber = $"KC{nextSeq}";
+
+                var order = new Order
+                {
+                    OrderNumber = orderNumber,
+                    CustomerId = customer.CustomerId,
+                    OrderDate = DateTime.UtcNow,
+                    Subtotal = subtotal,
+                    DeliveryCharge = 0.00m,
+                    TotalAmount = subtotal,
+                    OrderStatus = "Order Placed",
+                    PaymentStatus = "Pending",
                     CreatedDate = DateTime.UtcNow
                 };
-                _dbContext.Customers.Add(customer);
+
+                _dbContext.Orders.Add(order);
                 await _dbContext.SaveChangesAsync();
-            }
-            else
-            {
-                // Update customer profile details if changed
-                customer.FullName = dto.CustomerName.Trim();
-                customer.Address = dto.Address.Trim();
-                customer.City = dto.City.Trim();
-                customer.Pincode = dto.Pincode.Trim();
-                if (!string.IsNullOrWhiteSpace(dto.Email)) customer.Email = dto.Email.Trim();
-                customer.ModifiedDate = DateTime.UtcNow;
+
+                // 5. Attach OrderId to OrderItems and save
+                foreach (var oi in orderItems)
+                {
+                    oi.OrderId = order.OrderId;
+                    _dbContext.OrderItems.Add(oi);
+                }
+
+                // 6. Log Status History
+                _dbContext.OrderStatusHistories.Add(new OrderStatusHistory
+                {
+                    OrderId = order.OrderId,
+                    OldStatus = null,
+                    NewStatus = "Order Placed",
+                    ChangedDate = DateTime.UtcNow,
+                    Remarks = dto.Remarks ?? "Order placed online"
+                });
+
                 await _dbContext.SaveChangesAsync();
-            }
 
-            // 4. Create Order with Sequential Invoice Number (e.g. KC10008, KC10009...)
-            var lastOrderNumber = await _dbContext.Orders
-                .OrderByDescending(o => o.OrderId)
-                .Select(o => o.OrderNumber)
-                .FirstOrDefaultAsync();
-
-            int nextSeq = 10001;
-            if (!string.IsNullOrEmpty(lastOrderNumber))
-            {
-                var digits = new string(lastOrderNumber.Where(char.IsDigit).ToArray());
-                if (int.TryParse(digits, out int currentSeq) && currentSeq >= 10000)
-                {
-                    nextSeq = currentSeq + 1;
-                }
-            }
-
-            var orderNumber = $"KC{nextSeq}";
-
-            var order = new Order
-            {
-                OrderNumber = orderNumber,
-                CustomerId = customer.CustomerId,
-                OrderDate = DateTime.UtcNow,
-                Subtotal = subtotal,
-                DeliveryCharge = 0.00m,
-                TotalAmount = subtotal,
-                OrderStatus = "Order Placed",
-                PaymentStatus = "Pending",
-                CreatedDate = DateTime.UtcNow
-            };
-
-            _dbContext.Orders.Add(order);
-            await _dbContext.SaveChangesAsync();
-
-            // 5. Attach OrderId to OrderItems and save
-            foreach (var oi in orderItems)
-            {
-                oi.OrderId = order.OrderId;
-                _dbContext.OrderItems.Add(oi);
-            }
-
-            // 6. Log Status History
-            _dbContext.OrderStatusHistories.Add(new OrderStatusHistory
-            {
-                OrderId = order.OrderId,
-                OldStatus = null,
-                NewStatus = "Order Placed",
-                ChangedDate = DateTime.UtcNow,
-                Remarks = dto.Remarks ?? "Order placed online"
-            });
-
-            await _dbContext.SaveChangesAsync();
-
-            // 7. AUTOMATIC ADMIN EMAIL NOTIFICATION DISPATCH (WITH ATTACHED ORDER PDF DOCUMENT)
-            var scopeFactory = HttpContext.RequestServices.GetRequiredService<IServiceScopeFactory>();
-            _ = Task.Run(async () => {
-                using var scope = scopeFactory.CreateScope();
-                try
-                {
-                    var scopedPdfExportService = scope.ServiceProvider.GetRequiredService<IPdfExportService>();
-                    var scopedEmailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
-
-                    var pdfBytes = await scopedPdfExportService.GenerateOrderInvoicePdfAsync(order.OrderId);
-                    await scopedEmailService.SendNewOrderAdminNotificationAsync(order, customer, orderItems, pdfBytes);
-                }
-                catch (Exception)
-                {
+                // 7. AUTOMATIC ADMIN EMAIL NOTIFICATION DISPATCH (WITH ATTACHED ORDER PDF DOCUMENT)
+                var scopeFactory = HttpContext.RequestServices.GetRequiredService<IServiceScopeFactory>();
+                _ = Task.Run(async () => {
+                    using var scope = scopeFactory.CreateScope();
                     try
                     {
+                        var scopedPdfExportService = scope.ServiceProvider.GetRequiredService<IPdfExportService>();
                         var scopedEmailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
-                        await scopedEmailService.SendNewOrderAdminNotificationAsync(order, customer, orderItems);
+
+                        var pdfBytes = await scopedPdfExportService.GenerateOrderInvoicePdfAsync(order.OrderId);
+                        await scopedEmailService.SendNewOrderAdminNotificationAsync(order, customer, orderItems, pdfBytes);
                     }
-                    catch
+                    catch (Exception)
                     {
-                        // Fallback ignore
+                        try
+                        {
+                            var scopedEmailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                            await scopedEmailService.SendNewOrderAdminNotificationAsync(order, customer, orderItems);
+                        }
+                        catch
+                        {
+                            // Fallback ignore
+                        }
                     }
-                }
-            });
+                });
 
-            var responseDto = new OrderDto
-            {
-                OrderId = order.OrderId,
-                OrderNumber = order.OrderNumber,
-                CustomerId = customer.CustomerId,
-                CustomerName = customer.FullName,
-                MobileNumber = customer.MobileNumber,
-                Address = customer.Address,
-                City = customer.City,
-                Pincode = customer.Pincode,
-                OrderDate = order.OrderDate.ToString("yyyy-MM-ddTHH:mm:ss"),
-                Subtotal = order.Subtotal,
-                DeliveryCharge = order.DeliveryCharge,
-                TotalAmount = order.TotalAmount,
-                OrderStatus = order.OrderStatus,
-                PaymentStatus = order.PaymentStatus,
-                Remarks = dto.Remarks,
-                OrderItems = orderItems.Select(oi => new OrderItemDto
+                var responseDto = new OrderDto
                 {
-                    OrderItemId = oi.OrderItemId,
-                    ProductId = oi.ProductId,
-                    ProductName = oi.ProductName,
-                    ProductCode = oi.ProductCode,
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice,
-                    TotalPrice = oi.TotalPrice
-                }).ToList()
-            };
+                    OrderId = order.OrderId,
+                    OrderNumber = order.OrderNumber,
+                    CustomerId = customer.CustomerId,
+                    CustomerName = customer.FullName,
+                    MobileNumber = customer.MobileNumber,
+                    Address = customer.Address,
+                    City = customer.City,
+                    Pincode = customer.Pincode,
+                    OrderDate = order.OrderDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    Subtotal = order.Subtotal,
+                    DeliveryCharge = order.DeliveryCharge,
+                    TotalAmount = order.TotalAmount,
+                    OrderStatus = order.OrderStatus,
+                    PaymentStatus = order.PaymentStatus,
+                    Remarks = dto.Remarks,
+                    OrderItems = orderItems.Select(oi => new OrderItemDto
+                    {
+                        OrderItemId = oi.OrderItemId,
+                        ProductId = oi.ProductId,
+                        ProductName = oi.ProductName,
+                        ProductCode = oi.ProductCode,
+                        Quantity = oi.Quantity,
+                        UnitPrice = oi.UnitPrice,
+                        TotalPrice = oi.TotalPrice
+                    }).ToList()
+                };
 
-            return CreatedAtAction(nameof(GetOrderById), new { id = order.OrderId }, responseDto);
+                return CreatedAtAction(nameof(GetOrderById), new { id = order.OrderId }, responseDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while placing the order.", details = ex.Message });
+            }
         }
 
         // GET: api/orders/{id} (Public)
