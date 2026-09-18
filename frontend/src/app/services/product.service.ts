@@ -305,7 +305,6 @@ export class ProductService {
   }
 
   exportPriceListCsv(products: Product[], categoryTitle?: string, categoryId?: number): void {
-    this.generatePriceListPdf(products, categoryTitle, categoryId);
     this.triggerServerPdfDownload(categoryId);
   }
 
