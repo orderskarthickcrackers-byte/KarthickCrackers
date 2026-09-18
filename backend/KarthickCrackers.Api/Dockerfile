@@ -1,5 +1,5 @@
 # Stage 1: Build Angular Frontend
-FROM node:20-alpine AS frontend-build
+FROM node:22-alpine AS frontend-build
 WORKDIR /src/frontend
 COPY frontend/package*.json ./
 RUN npm ci
