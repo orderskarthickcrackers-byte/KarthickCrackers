@@ -21,12 +21,11 @@ RUN dotnet publish -c Release -o /app/publish
 # Stage 3: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 RUN apt-get update && apt-get install -y \
-    chromium-browser \
+    libfontconfig1 \
     fonts-liberation \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 WORKDIR /app
 COPY --from=backend-build /app/publish .
 EXPOSE 8080

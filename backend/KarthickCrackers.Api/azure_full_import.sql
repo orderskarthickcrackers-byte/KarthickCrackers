@@ -86,8 +86,8 @@ BEGIN
         [OrderStatus] NVARCHAR(50) NOT NULL DEFAULT 'Order Placed',
         [PaymentStatus] NVARCHAR(50) NOT NULL DEFAULT 'Pending',
         [CreatedDate] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CONSTRAINT [PK_Orders] PRIMARY KEY CLUSTERED ([OrderId] ASC),
-        CONSTRAINT [FK_Orders_Customers] FOREIGN KEY ([CustomerId]) REFERENCES [dbo].[Customers] ([CustomerId]) ON DELETE CASCADE
+        [ModifiedDate] DATETIME2 NULL,
+        CONSTRAINT [PK_Orders] PRIMARY KEY CLUSTERED ([OrderId] ASC)
     );
 END
 GO

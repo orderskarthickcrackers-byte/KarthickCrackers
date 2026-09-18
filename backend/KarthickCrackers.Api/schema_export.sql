@@ -86,8 +86,8 @@ BEGIN
         [OrderStatus] NVARCHAR(50) NOT NULL DEFAULT 'Order Placed',
         [PaymentStatus] NVARCHAR(50) NOT NULL DEFAULT 'Pending',
         [CreatedDate] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
-        CONSTRAINT [PK_Orders] PRIMARY KEY CLUSTERED ([OrderId] ASC),
-        CONSTRAINT [FK_Orders_Customers] FOREIGN KEY ([CustomerId]) REFERENCES [dbo].[Customers] ([CustomerId]) ON DELETE CASCADE
+        [ModifiedDate] DATETIME2 NULL,
+        CONSTRAINT [PK_Orders] PRIMARY KEY CLUSTERED ([OrderId] ASC)
     );
 END
 GO
@@ -114,14 +114,13 @@ GO
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[OrderStatusHistories]') AND type in (N'U'))
 BEGIN
     CREATE TABLE [dbo].[OrderStatusHistories] (
-        [HistoryId] INT IDENTITY(1,1) NOT NULL,
+        [OrderStatusHistoryId] INT IDENTITY(1,1) NOT NULL,
         [OrderId] INT NOT NULL,
         [OldStatus] NVARCHAR(50) NULL,
         [NewStatus] NVARCHAR(50) NOT NULL,
         [ChangedDate] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
         [Remarks] NVARCHAR(MAX) NULL,
-        CONSTRAINT [PK_OrderStatusHistories] PRIMARY KEY CLUSTERED ([HistoryId] ASC),
-        CONSTRAINT [FK_OrderStatusHistories_Orders] FOREIGN KEY ([OrderId]) REFERENCES [dbo].[Orders] ([OrderId]) ON DELETE CASCADE
+        CONSTRAINT [PK_OrderStatusHistories] PRIMARY KEY CLUSTERED ([OrderStatusHistoryId] ASC)
     );
 END
 GO

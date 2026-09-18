@@ -70,6 +70,18 @@ namespace KarthickCrackers.Api.Data
                     ALTER TABLE [Users] ADD [MobileNumber] nvarchar(20) NULL;
                 END
                 EXEC('UPDATE [Users] SET [MobileNumber] = ''7010616198'' WHERE [Role] = ''Admin'' AND ([MobileNumber] IS NULL OR [MobileNumber] = '''')');
+
+                -- FIX: Add ModifiedDate column to Orders table if missing (required by EF Core Order entity)
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Orders') AND name = 'ModifiedDate')
+                BEGIN
+                    ALTER TABLE [Orders] ADD [ModifiedDate] datetime2 NULL;
+                END
+
+                -- FIX: Drop FK_Orders_Customers if it exists (EF Core model has no FK, cascade causes issues)
+                IF EXISTS (SELECT * FROM sys.foreign_keys WHERE name = 'FK_Orders_Customers' AND parent_object_id = OBJECT_ID('Orders'))
+                BEGIN
+                    ALTER TABLE [Orders] DROP CONSTRAINT [FK_Orders_Customers];
+                END
             ");
 
             context.Database.ExecuteSqlRaw(@"
