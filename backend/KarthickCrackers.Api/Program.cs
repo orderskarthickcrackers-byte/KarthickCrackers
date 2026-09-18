@@ -106,10 +106,33 @@ app.UseCors("AllowAngularFrontend");
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+var webRoot = app.Environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+var browserDir = Path.Combine(webRoot, "browser");
+if (Directory.Exists(browserDir))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(browserDir),
+        RequestPath = ""
+    });
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapFallbackToFile("index.html");
+
+if (File.Exists(Path.Combine(webRoot, "index.html")))
+{
+    app.MapFallbackToFile("index.html");
+}
+else if (Directory.Exists(browserDir) && File.Exists(Path.Combine(browserDir, "index.html")))
+{
+    app.MapFallbackToFile("browser/index.html");
+}
+else
+{
+    app.MapFallbackToFile("index.html");
+}
 
 app.Run();
