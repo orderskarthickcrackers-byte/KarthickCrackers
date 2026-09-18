@@ -160,6 +160,26 @@ BEGIN
 END
 GO
 
+-- 9. WHATSAPP LOGS TABLE (META WHATSAPP API AUDIT TRAIL)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[WhatsAppLogs]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[WhatsAppLogs] (
+        [Id] INT IDENTITY(1,1) NOT NULL,
+        [OrderId] INT NOT NULL,
+        [CustomerId] INT NOT NULL,
+        [PhoneNumber] NVARCHAR(20) NOT NULL,
+        [TemplateName] NVARCHAR(100) NOT NULL,
+        [WhatsAppMessageId] NVARCHAR(100) NULL,
+        [Status] NVARCHAR(50) NOT NULL DEFAULT 'PENDING',
+        [ErrorMessage] NVARCHAR(MAX) NULL,
+        [CreatedAt] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+        [SentAt] DATETIME2 NULL,
+        CONSTRAINT [PK_WhatsAppLogs] PRIMARY KEY CLUSTERED ([Id] ASC)
+    );
+    CREATE INDEX [IX_WhatsAppLogs_OrderId_TemplateName] ON [dbo].[WhatsAppLogs] ([OrderId], [TemplateName]);
+END
+GO
+
 -- SEED PAYMENT SETTINGS
 IF NOT EXISTS (SELECT 1 FROM [dbo].[PaymentSettings])
 BEGIN
