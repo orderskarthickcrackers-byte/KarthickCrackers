@@ -131,12 +131,13 @@ IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Us
 BEGIN
     CREATE TABLE [dbo].[Users] (
         [UserId] INT IDENTITY(1,1) NOT NULL,
-        [Username] NVARCHAR(100) NOT NULL,
         [Email] NVARCHAR(150) NOT NULL,
+        [MobileNumber] NVARCHAR(20) NULL,
         [PasswordHash] NVARCHAR(MAX) NOT NULL,
         [Role] NVARCHAR(50) NOT NULL DEFAULT 'Admin',
         [IsActive] BIT NOT NULL DEFAULT 1,
         [CreatedDate] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+        [ModifiedDate] DATETIME2 NULL,
         CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([UserId] ASC)
     );
 END
