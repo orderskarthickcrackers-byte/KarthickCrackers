@@ -5,6 +5,7 @@ import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { PaymentSettingsService, PaymentSetting } from '../../services/payment-settings.service';
 import { OrderDetails } from '../../models/product.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-confirmation',
@@ -98,7 +99,7 @@ export class ConfirmationComponent implements OnInit {
     text += `(Strictly NO Cash On Delivery / COD)\n`;
     text += `----------------------------------------\n`;
     text += `📄 *Download Official PDF Order Bill Document:*\n`;
-    text += `http://localhost:5083/api/orders/number/${this.order.orderId}/pdf`;
+    text += `${environment.apiUrl}/orders/number/${this.order.orderId}/pdf`;
 
     return text;
   }
@@ -116,6 +117,6 @@ export class ConfirmationComponent implements OnInit {
 
   getPdfInvoiceUrl(): string {
     if (!this.order) return '#';
-    return `http://localhost:5083/api/orders/number/${this.order.orderId}/pdf`;
+    return `${environment.apiUrl}/orders/number/${this.order.orderId}/pdf`;
   }
 }

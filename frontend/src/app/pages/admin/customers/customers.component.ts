@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { AdminSidebarComponent } from '../../../components/admin-sidebar/admin-sidebar.component';
 import { AuthService } from '../../../services/auth.service';
 import { ProductService } from '../../../services/product.service';
+import { environment } from '../../../../environments/environment';
 
 export interface CustomerItem {
   customerId: number;
@@ -81,7 +82,7 @@ export class CustomersComponent implements OnInit {
     this.errorMessage = '';
     this.cdr.markForCheck();
 
-    let url = `http://localhost:5083/api/admin/customers?page=${this.page}&pageSize=${this.pageSize}`;
+    let url = `${environment.apiUrl}/admin/customers?page=${this.page}&pageSize=${this.pageSize}`;
     if (this.searchQuery.trim()) {
       url += `&search=${encodeURIComponent(this.searchQuery.trim())}`;
     }
@@ -121,7 +122,7 @@ export class CustomersComponent implements OnInit {
   }
 
   openViewModal(cust: CustomerItem): void {
-    this.http.get<CustomerDetail>(`http://localhost:5083/api/admin/customers/${cust.customerId}`).subscribe({
+    this.http.get<CustomerDetail>(`${environment.apiUrl}/admin/customers/${cust.customerId}`).subscribe({
       next: (detail) => {
         this.selectedCustomer = detail;
         this.isViewModalOpen = true;
@@ -164,7 +165,7 @@ export class CustomersComponent implements OnInit {
     this.actionErrorMessage = '';
     this.actionSuccessMessage = '';
 
-    const url = `http://localhost:5083/api/admin/customers/${this.editCustomerData.customerId}`;
+    const url = `${environment.apiUrl}/admin/customers/${this.editCustomerData.customerId}`;
     this.http.put<CustomerItem>(url, this.editCustomerData).subscribe({
       next: (res) => {
         this.isSaving = false;
@@ -193,7 +194,7 @@ export class CustomersComponent implements OnInit {
     this.isDeleting = true;
     this.actionErrorMessage = '';
 
-    const url = `http://localhost:5083/api/admin/customers/${this.customerToDelete.customerId}`;
+    const url = `${environment.apiUrl}/admin/customers/${this.customerToDelete.customerId}`;
     this.http.delete<any>(url).subscribe({
       next: () => {
         this.isDeleting = false;

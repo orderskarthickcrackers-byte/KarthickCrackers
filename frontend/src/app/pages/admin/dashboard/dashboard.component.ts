@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { AdminSidebarComponent } from '../../../components/admin-sidebar/admin-sidebar.component';
 import { DashboardService, DashboardStats, RecentOrder } from '../../../services/dashboard.service';
 import { AuthService } from '../../../services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard',
@@ -164,7 +165,7 @@ export class DashboardComponent implements OnInit {
       remarks: this.statusRemarks || `Status updated to ${this.newStatus}`
     };
 
-    this.http.put<any>(`http://localhost:5083/api/orders/admin/${this.selectedOrder.orderId}/status`, payload).subscribe({
+    this.http.put<any>(`${environment.apiUrl}/orders/admin/${this.selectedOrder.orderId}/status`, payload).subscribe({
       next: (res) => {
         this.isUpdatingStatus = false;
         if (this.selectedOrder) {

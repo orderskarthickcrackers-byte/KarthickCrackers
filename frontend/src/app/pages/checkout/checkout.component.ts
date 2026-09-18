@@ -7,6 +7,7 @@ import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { PaymentSettingsService } from '../../services/payment-settings.service';
 import { Product, OrderDetails } from '../../models/product.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-checkout',
@@ -111,7 +112,7 @@ export class CheckoutComponent implements OnInit {
       items: itemsPayload
     };
 
-    this.http.post<any>('http://localhost:5083/api/orders', payload).subscribe({
+    this.http.post<any>(`${environment.apiUrl}/orders`, payload).subscribe({
       next: (res) => {
         this.isSubmitting = false;
 
