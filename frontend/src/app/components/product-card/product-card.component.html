@@ -10,17 +10,11 @@
     } @else {
       <img [src]="product.image" [alt]="product.name" class="product-img" (error)="onImgError($event)">
     }
-    @if (currentQty > 0) {
-      <div class="pc-qty-pill" (click)="$event.stopPropagation()">
-        <button type="button" class="pc-qty-btn" (click)="onDecrement($event)">−</button>
-        <span class="pc-qty-num">{{ currentQty }}</span>
-        <button type="button" class="pc-qty-btn" (click)="onIncrement($event)">+</button>
-      </div>
-    } @else {
-      <button type="button" class="pc-quickadd" (click)="onQuickAdd($event)" [attr.aria-label]="'Add ' + product.name + ' to cart'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
-      </button>
-    }
+    <div class="pc-qty-pill" (click)="$event.stopPropagation()">
+      <button type="button" class="pc-qty-btn" (click)="onDecrement($event)" [disabled]="currentQty === 0" [style.opacity]="currentQty === 0 ? '0.35' : '1'" [style.cursor]="currentQty === 0 ? 'default' : 'pointer'">−</button>
+      <span class="pc-qty-num">{{ currentQty }}</span>
+      <button type="button" class="pc-qty-btn" (click)="onIncrement($event)" [attr.aria-label]="'Add ' + product.name + ' to cart'">+</button>
+    </div>
   </div>
   <div class="pc-body">
     <span class="pc-code">{{ product.code }}</span>

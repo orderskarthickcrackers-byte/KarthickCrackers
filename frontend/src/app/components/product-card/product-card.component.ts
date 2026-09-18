@@ -81,7 +81,9 @@ export class ProductCardComponent {
 
   onDecrement(event: MouseEvent): void {
     event.stopPropagation();
-    this.cartService.decrementQty(this.product.code);
+    if (this.currentQty > 0) {
+      this.cartService.decrementQty(this.product.code);
+    }
   }
 
   navigateToDetail(): void {
