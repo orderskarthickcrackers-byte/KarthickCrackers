@@ -168,9 +168,9 @@ export class CategoryComponent implements OnInit {
   applyFilters(): void {
     const list = this.allProductsCache.length > 0 ? this.allProductsCache : this.productService.getProducts();
 
-    let result = list;
+    let result = [...list];
     if (!this.isAllSelected) {
-      result = list.filter(p => {
+      result = result.filter(p => {
         const catIdKey = p.categoryId ? p.categoryId.toString() : '';
         const catNameKey = p.cat ? p.cat.toLowerCase().replace(/\s+/g, '') : '';
         const matchId = catIdKey ? this.selectedCategories[catIdKey] : undefined;
@@ -185,6 +185,9 @@ export class CategoryComponent implements OnInit {
       result.sort((a: Product, b: Product) => b.price - a.price);
     } else if (this.sortOption === 'name') {
       result.sort((a: Product, b: Product) => a.name.localeCompare(b.name));
+    } else if (this.sortOption === 'popular') {
+      // Products are returned from API in popular order, so spreading [...list] already restores it.
+      // Do nothing extra here.
     }
 
     this.products = result;
@@ -231,6 +234,7 @@ export class CategoryComponent implements OnInit {
     return '🎁';
   }
 }
+
 
 
 
