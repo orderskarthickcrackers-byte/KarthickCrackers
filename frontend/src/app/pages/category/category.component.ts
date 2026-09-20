@@ -7,6 +7,7 @@ import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { LoaderComponent } from '../../components/loader/loader.component';
+import { SeoService } from '../../services/seo.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -30,7 +31,8 @@ export class CategoryComponent implements OnInit {
     private productService: ProductService,
     public cartService: CartService,
     private sanitizer: DomSanitizer,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private seoService: SeoService
   ) {}
 
   ngOnInit(): void {
@@ -43,20 +45,31 @@ export class CategoryComponent implements OnInit {
         this.allProductsCache = res.prods;
         
         this.route.paramMap.subscribe(params => {
-          const catId = params.get('id');
-          if (!catId || catId === 'all') {
+          const catSlugOrId = params.get('slug') || params.get('id');
+          if (!catSlugOrId || catSlugOrId === 'all') {
             this.selectAllCategories();
           } else {
             this.isAllSelected = false;
             this.selectedCategories = {};
-            this.selectedCategories[catId] = true;
-            const matchedCat = res.cats.find(c => c.id === catId || c.name.toLowerCase() === catId.toLowerCase());
+            this.selectedCategories[catSlugOrId] = true;
+            const matchedCat = res.cats.find(c => c.categorySlug === catSlugOrId || c.id === catSlugOrId || c.name.toLowerCase() === catSlugOrId.toLowerCase());
             if (matchedCat) {
               this.category = matchedCat;
               this.selectedCategories[matchedCat.id] = true;
             }
           }
+          
           this.applyFilters();
+          
+          if (this.category) {
+            const title = this.category.id === 'all' ? 'All Fireworks | Karthick Crackers' : `${this.category.name} | Karthick Crackers`;
+            this.seoService.updateTitle(title);
+            this.seoService.updateMetaDescription(this.category.desc || `Buy ${this.category.name} fireworks online from Sivakasi.`);
+            
+            const urlPath = this.category.id === 'all' ? 'categories/all' : `categories/${this.category.categorySlug || this.category.id}`;
+            this.seoService.updateCanonical(`https://www.karthickcrackers.in/${urlPath}`);
+          }
+
           this.isLoading = false;
           this.cdr.detectChanges();
         });

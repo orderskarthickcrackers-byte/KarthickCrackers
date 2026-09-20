@@ -8,8 +8,10 @@ export interface ApiProduct {
   productId: number;
   productCode: string;
   productName: string;
+  productSlug?: string;
   categoryId: number;
   categoryName: string;
+  categorySlug?: string;
   description?: string;
   price: number;
   mrpPrice: number;
@@ -160,6 +162,7 @@ export class ProductService {
           return {
             id: cId,
             name: cName,
+            categorySlug: c.categorySlug,
             count: 0,
             icon: cName.toLowerCase(),
             image: this.getCategoryDefaultImage(cName),
@@ -215,6 +218,7 @@ export class ProductService {
       productId: p.productId,
       code: p.productCode,
       name: name,
+      productSlug: p.productSlug,
       cat: p.categoryName ? p.categoryName.toLowerCase().replace(/\s+/g, '') : 'sparklers',
       categoryId: p.categoryId,
       categoryName: p.categoryName,

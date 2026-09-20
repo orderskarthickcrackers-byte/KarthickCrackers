@@ -78,7 +78,8 @@ namespace KarthickCrackers.Api.Services
 
         public async Task<ProductDto?> GetProductByCodeAsync(string code)
         {
-            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductCode.ToLower() == code.Trim().ToLower());
+            var searchStr = code.Trim().ToLower();
+            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ProductCode.ToLower() == searchStr || (p.ProductSlug != null && p.ProductSlug.ToLower() == searchStr));
             if (product == null) return null;
 
             var category = await _dbContext.Categories.FirstOrDefaultAsync(c => c.CategoryId == product.CategoryId);
@@ -431,6 +432,7 @@ namespace KarthickCrackers.Api.Services
                 ProductId = p.ProductId,
                 ProductCode = p.ProductCode ?? "",
                 ProductName = p.ProductName ?? "",
+                ProductSlug = p.ProductSlug,
                 CategoryId = p.CategoryId,
                 CategoryName = categoryName,
                 Description = p.Description,

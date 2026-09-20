@@ -8,6 +8,7 @@ import { ProductService } from '../../services/product.service';
 import { PaymentSettingsService } from '../../services/payment-settings.service';
 import { Product, OrderDetails } from '../../models/product.model';
 import { environment } from '../../../environments/environment';
+import { SeoService } from '../../services/seo.service';
 
 @Component({
   selector: 'app-checkout',
@@ -40,10 +41,13 @@ export class CheckoutComponent implements OnInit {
     private productService: ProductService,
     public paymentSettingsService: PaymentSettingsService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private seoService: SeoService
   ) {}
 
   ngOnInit(): void {
+    this.seoService.updateTitle('Checkout | Karthick Crackers');
+    this.seoService.setNoIndex();
     this.productService.fetchProducts().subscribe();
 
     if (!this.cartService.isMinimumOrderMet() && this.cartService.cartItems().length > 0) {

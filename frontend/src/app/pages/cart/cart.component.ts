@@ -5,6 +5,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
+import { SeoService } from '../../services/seo.service';
 
 @Component({
   selector: 'app-cart',
@@ -16,10 +17,13 @@ export class CartComponent implements OnInit {
   constructor(
     public cartService: CartService,
     private productService: ProductService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private seoService: SeoService
   ) {}
 
   ngOnInit(): void {
+    this.seoService.updateTitle('Your Cart | Karthick Crackers');
+    this.seoService.setNoIndex();
     this.productService.fetchProducts().subscribe();
   }
 

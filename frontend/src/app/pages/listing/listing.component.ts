@@ -6,6 +6,7 @@ import { Category, Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { LoaderComponent } from '../../components/loader/loader.component';
+import { SeoService } from '../../services/seo.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -27,10 +28,15 @@ export class ListingComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private seoService: SeoService
   ) {}
 
   ngOnInit(): void {
+    this.seoService.updateTitle('Shop All Fireworks | Karthick Crackers');
+    this.seoService.updateMetaDescription('Browse our complete collection of authentic Sivakasi crackers, sparklers, rockets, and Diwali gift boxes. Best prices and direct factory delivery.');
+    this.seoService.updateCanonical('https://www.karthickcrackers.in/products');
+
     forkJoin({
       cats: this.productService.fetchCategories(),
       prods: this.productService.fetchProducts()

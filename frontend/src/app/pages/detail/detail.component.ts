@@ -7,6 +7,7 @@ import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { PaymentSettingsService } from '../../services/payment-settings.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { SeoService } from '../../services/seo.service';
 
 @Component({
   selector: 'app-detail',
@@ -26,23 +27,28 @@ export class DetailComponent implements OnInit {
     private cartService: CartService,
     public paymentSettingsService: PaymentSettingsService,
     private sanitizer: DomSanitizer,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private seoService: SeoService
   ) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
-      const code = params.get('code') || '';
-      this.loadProduct(code);
+      const slugOrCode = params.get('slug') || params.get('code') || '';
+      this.loadProduct(slugOrCode);
     });
   }
 
-  loadProduct(code: string): void {
+  loadProduct(slugOrCode: string): void {
     this.quantity = 1;
     this.productService.fetchProducts().subscribe(all => {
-      let found = all.find(x => x.code.toLowerCase() === code.toLowerCase() || x.code === code);
-      if (!found && code) {
+      let found = all.find(x => 
+        (x.productSlug && x.productSlug.toLowerCase() === slugOrCode.toLowerCase()) || 
+        x.code.toLowerCase() === slugOrCode.toLowerCase() || 
+        x.code === slugOrCode
+      );
+      if (!found && slugOrCode) {
         // Try partial code match (e.g. KHC-1002 vs 1002)
-        found = all.find(x => x.code.toLowerCase().includes(code.toLowerCase()));
+        found = all.find(x => x.code.toLowerCase().includes(slugOrCode.toLowerCase()));
       }
       if (!found && all.length > 0) {
         found = all[0];
@@ -63,6 +69,35 @@ export class DetailComponent implements OnInit {
 
         const related = all.filter((x: Product) => x.code !== this.product?.code).slice(0, 4);
         this.relatedProducts = related;
+
+        // SEO
+        const title = `${this.product.name} | Karthick Crackers`;
+        const desc = this.product.desc || `Buy ${this.product.name} fireworks online from Sivakasi. High quality, safe, and loud.`;
+        const url = `https://www.karthickcrackers.in/products/${this.product.productSlug || this.product.code}`;
+        const img = `https://www.karthickcrackers.in${this.product.image}`;
+        
+        this.seoService.updateTitle(title);
+        this.seoService.updateMetaDescription(desc);
+        this.seoService.updateCanonical(url);
+        this.seoService.updateOpenGraphImage(img);
+
+        this.seoService.addJsonLd({
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: this.product.name,
+          image: img,
+          description: desc,
+          sku: this.product.code,
+          offers: {
+            '@type': 'Offer',
+            url: url,
+            priceCurrency: 'INR',
+            price: this.product.price,
+            priceValidUntil: '2026-12-31',
+            itemCondition: 'https://schema.org/NewCondition',
+            availability: (this.product.totalQuantity || 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
+          }
+        }, 'product-schema');
       }
       this.cdr.detectChanges();
     });

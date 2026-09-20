@@ -1,6 +1,7 @@
 export interface Category {
   id: string;
   name: string;
+  categorySlug?: string;
   count: number;
   icon: string;
   image: string;
@@ -15,6 +16,7 @@ export interface Product {
   productId?: number;
   code: string;
   name: string;
+  productSlug?: string;
   cat: string;
   categoryId?: number;
   categoryName?: string;

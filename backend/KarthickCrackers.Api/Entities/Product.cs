@@ -17,6 +17,9 @@ namespace KarthickCrackers.Api.Entities
         [MaxLength(150)]
         public string ProductName { get; set; } = string.Empty;
 
+        [MaxLength(255)]
+        public string? ProductSlug { get; set; }
+
         // Stores Categories.CategoryId value without SQL FK constraint
         public int CategoryId { get; set; }
 

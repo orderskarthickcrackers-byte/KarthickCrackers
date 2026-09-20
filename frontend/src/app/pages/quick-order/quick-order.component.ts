@@ -6,6 +6,7 @@ import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { Category, Product } from '../../models/product.model';
 import { LoaderComponent } from '../../components/loader/loader.component';
+import { SeoService } from '../../services/seo.service';
 
 export interface GroupedCategory {
   id: string;
@@ -31,10 +32,14 @@ export class QuickOrderComponent implements OnInit {
 
   constructor(
     public productService: ProductService,
-    public cartService: CartService
+    public cartService: CartService,
+    private seoService: SeoService
   ) {}
 
   ngOnInit(): void {
+    this.seoService.updateTitle('Quick Order Form | Karthick Crackers');
+    this.seoService.updateMetaDescription('Quickly select and order all your Diwali fireworks from Karthick Crackers. Use our fast price list view to easily add items to cart.');
+    this.seoService.updateCanonical('https://www.karthickcrackers.in/quick-order');
     this.loadData();
   }
 

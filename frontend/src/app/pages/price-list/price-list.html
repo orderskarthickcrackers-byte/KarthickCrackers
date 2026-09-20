@@ -1,0 +1,56 @@
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold mb-3">Sivakasi Crackers Price List 2026</h1>
+    <p class="lead text-muted mx-auto" style="max-width: 700px;">
+      Explore our comprehensive wholesale price list for all Sivakasi fireworks. 
+      Purchase premium quality crackers directly from the factory at the lowest prices.
+    </p>
+    <div class="mt-4">
+      <button class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm" (click)="downloadPdf()">
+        <i class="bi bi-file-earmark-pdf me-2"></i> Download PDF Price List
+      </button>
+      <a routerLink="/quick-order" class="btn btn-outline-secondary btn-lg rounded-pill px-4 shadow-sm ms-2">
+        <i class="bi bi-cart me-2"></i> Quick Order Now
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && products.length > 0" class="table-responsive shadow-sm rounded-4 overflow-hidden border">
+    <table class="table table-hover table-striped mb-0 bg-white">
+      <thead class="table-light">
+        <tr>
+          <th scope="col" class="py-3 px-4">Code</th>
+          <th scope="col" class="py-3 px-4">Product Name</th>
+          <th scope="col" class="py-3 px-4">Category</th>
+          <th scope="col" class="py-3 px-4 text-center">Unit</th>
+          <th scope="col" class="py-3 px-4 text-end">MRP</th>
+          <th scope="col" class="py-3 px-4 text-end">Our Price</th>
+          <th scope="col" class="py-3 px-4 text-center">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of products">
+          <td class="align-middle px-4 text-muted">{{ p.code }}</td>
+          <td class="align-middle px-4 fw-medium">
+            <a [routerLink]="['/products', p.productSlug || p.code]" class="text-decoration-none text-dark hover-primary">
+              {{ p.name }}
+            </a>
+          </td>
+          <td class="align-middle px-4">{{ p.categoryName || 'Fireworks' }}</td>
+          <td class="align-middle px-4 text-center text-muted">{{ p.unit || '1 Box' }}</td>
+          <td class="align-middle px-4 text-end text-decoration-line-through text-muted">{{ formatPrice(p.mrpPrice || p.price) }}</td>
+          <td class="align-middle px-4 text-end fw-bold text-success">{{ formatPrice(p.price) }}</td>
+          <td class="align-middle px-4 text-center">
+            <a routerLink="/quick-order" class="btn btn-sm btn-outline-primary rounded-pill px-3">Add</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

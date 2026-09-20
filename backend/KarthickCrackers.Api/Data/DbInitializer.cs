@@ -160,6 +160,20 @@ namespace KarthickCrackers.Api.Data
                 EXEC('UPDATE [Products] SET [ProductCode] = REPLACE(REPLACE(REPLACE([ProductCode], ''KC-'', ''''), ''KHC-'', ''''), ''KC'', '''') WHERE [ProductCode] LIKE ''%KC%'' OR [ProductCode] LIKE ''%KHC%''');
                 EXEC('UPDATE [OrderItems] SET [ProductCode] = REPLACE(REPLACE(REPLACE([ProductCode], ''KC-'', ''''), ''KHC-'', ''''), ''KC'', '''') WHERE [ProductCode] LIKE ''%KC%'' OR [ProductCode] LIKE ''%KHC%''');
 
+                -- FIX: Add CategorySlug if missing
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Categories') AND name = 'CategorySlug')
+                BEGIN
+                    ALTER TABLE [Categories] ADD [CategorySlug] nvarchar(255) NULL;
+                    EXEC('UPDATE [Categories] SET [CategorySlug] = LOWER(REPLACE(REPLACE(REPLACE([CategoryName], '' '', ''-''), ''&'', ''and''), '','', '''')) WHERE [CategorySlug] IS NULL');
+                END
+
+                -- FIX: Add ProductSlug if missing
+                IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID('Products') AND name = 'ProductSlug')
+                BEGIN
+                    ALTER TABLE [Products] ADD [ProductSlug] nvarchar(255) NULL;
+                    EXEC('UPDATE [Products] SET [ProductSlug] = LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE([ProductName], '' '', ''-''), ''&'', ''and''), '','', ''''), ''/'', ''-''), ''('', ''''), '')'', '''')) + ''-'' + [ProductCode] WHERE [ProductSlug] IS NULL');
+                END
+
                 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Customers')
                 BEGIN
                     CREATE TABLE [Customers] (

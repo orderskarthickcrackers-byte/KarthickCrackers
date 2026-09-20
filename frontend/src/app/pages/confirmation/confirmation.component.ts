@@ -6,6 +6,7 @@ import { ProductService } from '../../services/product.service';
 import { PaymentSettingsService, PaymentSetting } from '../../services/payment-settings.service';
 import { OrderDetails } from '../../models/product.model';
 import { environment } from '../../../environments/environment';
+import { SeoService } from '../../services/seo.service';
 
 @Component({
   selector: 'app-confirmation',
@@ -24,8 +25,12 @@ export class ConfirmationComponent implements OnInit {
   public cartService = inject(CartService);
   private productService = inject(ProductService);
   public paymentSettingsService = inject(PaymentSettingsService);
+  private seoService = inject(SeoService);
 
   ngOnInit(): void {
+    this.seoService.updateTitle('Order Confirmed | Karthick Crackers');
+    this.seoService.setNoIndex();
+
     this.order = this.cartService.lastOrder() || {
       orderId: 'KC10001',
       customerName: 'Karthick Raja',

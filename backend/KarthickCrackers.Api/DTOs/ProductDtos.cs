@@ -7,6 +7,7 @@ namespace KarthickCrackers.Api.DTOs
         public int ProductId { get; set; }
         public string ProductCode { get; set; } = string.Empty;
         public string ProductName { get; set; } = string.Empty;
+        public string? ProductSlug { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public string? Description { get; set; }

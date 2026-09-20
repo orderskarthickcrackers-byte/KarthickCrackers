@@ -27,6 +27,7 @@ namespace KarthickCrackers.Api.Controllers
                 {
                     c.CategoryId,
                     c.CategoryName,
+                    c.CategorySlug,
                     c.Description,
                     c.IsActive
                 })
