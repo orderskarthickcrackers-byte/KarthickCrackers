@@ -239,6 +239,25 @@ namespace KarthickCrackers.Api.Controllers
             }
         }
 
+        // GET: api/orders/test-email (Public - Temporary for diagnostics)
+        [HttpGet("test-email")]
+        public async Task<IActionResult> TestEmail()
+        {
+            try
+            {
+                var order = new Order { OrderNumber = "TEST1234", OrderStatus = "Test", PaymentStatus = "Test" };
+                var customer = new Customer { FullName = "Test User", MobileNumber = "1234567890", Email = "orders.karthick.crackers@gmail.com" };
+                var items = new List<OrderItem> { new OrderItem { ProductName = "Test", ProductCode = "T1", Quantity = 1, UnitPrice = 100, TotalPrice = 100 } };
+                
+                await _emailService.SendNewOrderAdminNotificationAsync(order, customer, items);
+                return Ok(new { message = "Email sent successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Email sending failed", details = ex.Message, inner = ex.InnerException?.Message });
+            }
+        }
+
         // GET: api/orders/{id} (Public)
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrderById(int id)

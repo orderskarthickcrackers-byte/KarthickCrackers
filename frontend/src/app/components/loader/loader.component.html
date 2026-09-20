@@ -1,0 +1,7 @@
+<div class="loader-container" [class.full-screen]="fullScreen">
+  <div class="spinner">
+    <div class="double-bounce1"></div>
+    <div class="double-bounce2"></div>
+  </div>
+  <p *ngIf="message" class="loading-message">{{ message }}</p>
+</div>

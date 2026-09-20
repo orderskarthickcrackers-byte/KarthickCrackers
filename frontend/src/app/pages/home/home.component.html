@@ -1,3 +1,6 @@
+<app-loader *ngIf="isLoading" message="Preparing factory outlet prices..."></app-loader>
+
+<ng-container *ngIf="!isLoading">
 <!-- Top Contact & Announcement Ribbon (Sliding Ticker) -->
 <div class="top-announcement-bar" title="Hover to pause continuous announcement ticker">
   <div class="announcement-ticker-wrap">
@@ -258,3 +261,5 @@
     </div>
   </div>
 </div>
+< / n g - c o n t a i n e r >  
+ 

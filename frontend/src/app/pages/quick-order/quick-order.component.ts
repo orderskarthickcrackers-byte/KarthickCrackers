@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { Category, Product } from '../../models/product.model';
+import { LoaderComponent } from '../../components/loader/loader.component';
 
 export interface GroupedCategory {
   id: string;
@@ -15,7 +16,7 @@ export interface GroupedCategory {
 @Component({
   selector: 'app-quick-order',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, LoaderComponent],
   templateUrl: './quick-order.component.html',
   styleUrls: ['./quick-order.component.scss']
 })
@@ -40,15 +41,20 @@ export class QuickOrderComponent implements OnInit {
   loadData(): void {
     this.isLoading.set(true);
     
-    // Fetch all categories first
-    this.productService.fetchCategories().subscribe(cats => {
-      this.categories.set(cats);
-    });
-
-    // Fetch all products
-    this.productService.fetchProducts().subscribe(prods => {
-      this.products.set(prods);
-      this.isLoading.set(false);
+    import('rxjs').then(({ forkJoin }) => {
+      forkJoin({
+        cats: this.productService.fetchCategories(),
+        prods: this.productService.fetchProducts()
+      }).subscribe({
+        next: (res) => {
+          this.categories.set(res.cats);
+          this.products.set(res.prods);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.isLoading.set(false);
+        }
+      });
     });
   }
 

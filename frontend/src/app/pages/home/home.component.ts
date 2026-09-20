@@ -6,17 +6,20 @@ import { ProductService } from '../../services/product.service';
 import { PaymentSettingsService } from '../../services/payment-settings.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { CategoryTileComponent } from '../../components/category-tile/category-tile.component';
+import { LoaderComponent } from '../../components/loader/loader.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, ProductCardComponent, CategoryTileComponent],
+  imports: [CommonModule, RouterModule, ProductCardComponent, CategoryTileComponent, LoaderComponent],
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
   categories: Category[] = [];
   featuredProducts: Product[] = [];
   isBurstPlaying = false;
+  isLoading = true;
 
   constructor(
     private productService: ProductService,
@@ -25,20 +28,26 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.productService.fetchCategories().subscribe(cats => {
-      this.categories = cats;
-      this.cdr.detectChanges();
+    forkJoin({
+      cats: this.productService.fetchCategories(),
+      prods: this.productService.fetchProducts()
+    }).subscribe({
+      next: (res) => {
+        this.categories = res.cats;
+        this.featuredProducts = res.prods.slice(0, 8);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+        
+        setTimeout(() => {
+          this.isBurstPlaying = true;
+          this.cdr.detectChanges();
+        }, 200);
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
-
-    this.productService.fetchProducts().subscribe(prods => {
-      this.featuredProducts = prods.slice(0, 8);
-      this.cdr.detectChanges();
-    });
-    
-    setTimeout(() => {
-      this.isBurstPlaying = true;
-      this.cdr.detectChanges();
-    }, 200);
   }
 
   onDownloadPriceList(): void {

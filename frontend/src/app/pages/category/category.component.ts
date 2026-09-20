@@ -6,11 +6,13 @@ import { Category, Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { LoaderComponent } from '../../components/loader/loader.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [CommonModule, RouterModule, ProductCardComponent],
+  imports: [CommonModule, RouterModule, ProductCardComponent, LoaderComponent],
   templateUrl: './category.component.html'
 })
 export class CategoryComponent implements OnInit {
@@ -20,6 +22,7 @@ export class CategoryComponent implements OnInit {
   selectedCategories: Record<string, boolean> = {};
   isAllSelected: boolean = false;
   allProductsCache: Product[] = [];
+  isLoading = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -31,25 +34,37 @@ export class CategoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.productService.fetchCategories().subscribe(cats => {
-      this.categories = cats;
-      this.route.paramMap.subscribe(params => {
-        const catId = params.get('id');
-        if (!catId || catId === 'all') {
-          this.selectAllCategories();
-        } else {
-          this.isAllSelected = false;
-          this.selectedCategories = {};
-          this.selectedCategories[catId] = true;
-          const matchedCat = cats.find(c => c.id === catId || c.name.toLowerCase() === catId.toLowerCase());
-          if (matchedCat) {
-            this.category = matchedCat;
-            this.selectedCategories[matchedCat.id] = true;
+    forkJoin({
+      cats: this.productService.fetchCategories(),
+      prods: this.productService.fetchProducts()
+    }).subscribe({
+      next: (res) => {
+        this.categories = res.cats;
+        this.allProductsCache = res.prods;
+        
+        this.route.paramMap.subscribe(params => {
+          const catId = params.get('id');
+          if (!catId || catId === 'all') {
+            this.selectAllCategories();
+          } else {
+            this.isAllSelected = false;
+            this.selectedCategories = {};
+            this.selectedCategories[catId] = true;
+            const matchedCat = res.cats.find(c => c.id === catId || c.name.toLowerCase() === catId.toLowerCase());
+            if (matchedCat) {
+              this.category = matchedCat;
+              this.selectedCategories[matchedCat.id] = true;
+            }
           }
-        }
-        this.loadProducts();
-      });
-      this.cdr.detectChanges();
+          this.applyFilters();
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 

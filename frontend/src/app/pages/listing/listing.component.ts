@@ -5,11 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { Category, Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { LoaderComponent } from '../../components/loader/loader.component';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-listing',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ProductCardComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ProductCardComponent, LoaderComponent],
   templateUrl: './listing.component.html'
 })
 export class ListingComponent implements OnInit {
@@ -21,6 +23,7 @@ export class ListingComponent implements OnInit {
   sortOption: string = 'popular';
   totalProductsCount: number = 0;
   allProductsCache: Product[] = [];
+  isLoading = true;
 
   constructor(
     private productService: ProductService,
@@ -28,18 +31,24 @@ export class ListingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.productService.fetchCategories().subscribe(cats => {
-      this.categories = cats;
-      this.selectAllCategories();
-      this.applyFilters();
-      this.cdr.detectChanges();
-    });
-
-    this.productService.fetchProducts().subscribe(prods => {
-      this.allProductsCache = prods;
-      this.totalProductsCount = prods.length;
-      this.applyFilters();
-      this.cdr.detectChanges();
+    forkJoin({
+      cats: this.productService.fetchCategories(),
+      prods: this.productService.fetchProducts()
+    }).subscribe({
+      next: (res) => {
+        this.categories = res.cats;
+        this.allProductsCache = res.prods;
+        this.totalProductsCount = res.prods.length;
+        
+        this.selectAllCategories();
+        this.applyFilters();
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 

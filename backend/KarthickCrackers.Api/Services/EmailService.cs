@@ -105,7 +105,7 @@ namespace KarthickCrackers.Api.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to send new order email notification for Order {OrderNumber} to {AdminEmail}. Error: {Message}", order.OrderNumber, _settings.AdminEmail, ex.Message);
-                // Intentionally swallow exception so order placement is never failed by email dispatch errors
+                throw; // Rethrow temporarily for diagnostics
             }
         }
 
