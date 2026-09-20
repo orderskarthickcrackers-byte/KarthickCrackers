@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Category, Product } from '../../models/product.model';
@@ -13,7 +14,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-category',
   standalone: true,
-  imports: [CommonModule, RouterModule, ProductCardComponent, LoaderComponent],
+  imports: [CommonModule, FormsModule, RouterModule, ProductCardComponent, LoaderComponent],
   templateUrl: './category.component.html'
 })
 export class CategoryComponent implements OnInit {
@@ -22,6 +23,7 @@ export class CategoryComponent implements OnInit {
   products: Product[] = [];
   selectedCategories: Record<string, boolean> = {};
   isAllSelected: boolean = false;
+  sortOption: string = 'popular';
   allProductsCache: Product[] = [];
   isLoading = true;
 
@@ -151,6 +153,10 @@ export class CategoryComponent implements OnInit {
     });
   }
 
+  onSortChange(): void {
+    this.applyFilters();
+  }
+
   loadProducts(): void {
     this.productService.fetchProducts().subscribe(prods => {
       this.allProductsCache = prods;
@@ -216,3 +222,5 @@ export class CategoryComponent implements OnInit {
     return '🎁';
   }
 }
+
+
