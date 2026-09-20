@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
+  { path: '', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
+  { path: 'home', redirectTo: '', pathMatch: 'full' },
   { path: 'products', loadComponent: () => import('./pages/listing/listing.component').then(m => m.ListingComponent) },
   { path: 'listing', redirectTo: 'products', pathMatch: 'full' },
   { path: 'quick-order', loadComponent: () => import('./pages/quick-order/quick-order.component').then(m => m.QuickOrderComponent) },
@@ -42,3 +42,4 @@ export const routes: Routes = [
   { path: '404', loadComponent: () => import('./pages/not-found/not-found').then(m => m.NotFound) },
   { path: '**', redirectTo: '404' }
 ];
+

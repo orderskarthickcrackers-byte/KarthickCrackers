@@ -1,7 +1,7 @@
 <div class="proto-bar">
   <span class="proto-label">Prototype preview</span>
   <div class="proto-views">
-    <a routerLink="/home" class="proto-btn" [class.is-active]="isActive('home')">Home</a>
+    <a routerLink="/" class="proto-btn" [class.is-active]="isActive('')">Home</a>
     <a routerLink="/products" class="proto-btn" [class.is-active]="isActive('listing')">Listing</a>
     <a routerLink="/categories/all" class="proto-btn" [class.is-active]="isActive('category')">Category</a>
     <a routerLink="/products/1" class="proto-btn" [class.is-active]="isActive('detail')">Product detail</a>
@@ -9,4 +9,5 @@
     <a routerLink="/checkout" class="proto-btn" [class.is-active]="isActive('checkout')">Checkout</a>
     <a routerLink="/admin/login" class="proto-btn" [class.is-active]="isActive('admin')">Admin Login</a>
 </div>
+
 
