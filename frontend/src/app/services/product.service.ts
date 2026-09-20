@@ -110,6 +110,10 @@ export class ProductService {
   }
 
   fetchProducts(search?: string, categoryId?: number): Observable<Product[]> {
+    if (!search && (!categoryId || categoryId === 0) && this.masterProductsMap.size > 0) {
+      return of(Array.from(this.masterProductsMap.values()));
+    }
+
     let params = new HttpParams();
     if (search) params = params.set('search', search);
     if (categoryId && categoryId > 0) params = params.set('categoryId', categoryId.toString());
@@ -154,6 +158,10 @@ export class ProductService {
   }
 
   fetchCategories(): Observable<Category[]> {
+    if (this.rawCategoriesCache.length > 0) {
+      return of(this.categoriesCache);
+    }
+
     return this.http.get<any[]>(this.categoryApiUrl).pipe(
       map(cats => {
         const mapped: Category[] = cats.map(c => {
