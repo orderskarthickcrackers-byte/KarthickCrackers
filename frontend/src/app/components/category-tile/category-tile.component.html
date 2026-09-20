@@ -1,4 +1,5 @@
-<a [routerLink]="['/category', category.id]" class="cat-tile">
+<a [routerLink]="['/categories', category.categorySlug || category.id]" class="cat-tile">
   <div class="cat-tile-icon-box" [innerHTML]="categoryIconSvg"></div>
   <span>{{ category.name }}</span>
 </a>
+

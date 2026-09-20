@@ -114,7 +114,7 @@
                         <td class="td-code"><span class="code-badge">[{{ p.code }}]</span></td>
                         <td class="td-desc">
                           <div class="prod-row-info">
-                            <a [routerLink]="['/detail', p.code]" class="prod-title-link">{{ p.name }}</a>
+                            <a [routerLink]="['/products', p.productSlug || p.code]" class="prod-title-link">{{ p.name }}</a>
                             <div class="prod-meta">
                               <span class="prod-unit">📦 {{ p.unit }}</span>
                               @if (p.badge) {

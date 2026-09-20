@@ -54,7 +54,7 @@
         <p class="lede">Buy 100% genuine, PESO safety-certified crackers directly from our factory at lowest wholesale prices. Fresh 2026 stock, 180+ items, and express transport delivery across Tamil Nadu & India!</p>
 
         <div class="hero-actions-row">
-          <a routerLink="/listing" class="btn btn-primary btn-hero-main">
+          <a routerLink="/products" class="btn btn-primary btn-hero-main">
             🛒 Shop 55% OFF Collection
           </a>
           <button (click)="onDownloadPriceList()" class="btn btn-price-pdf">
@@ -105,7 +105,7 @@
       <p class="eyebrow">Featured this week</p>
       <h2>Best-selling Sivakasi fireworks</h2>
     </div>
-    <a routerLink="/listing" class="btn btn-ghost btn-sm">Browse full catalogue</a>
+    <a routerLink="/products" class="btn btn-ghost btn-sm">Browse full catalogue</a>
   </div>
   <div class="product-grid">
     @for (product of featuredProducts; track product.code) {
@@ -121,7 +121,7 @@
       <p class="eyebrow">Shop by category</p>
       <h2>Find your kind of spark</h2>
     </div>
-    <a routerLink="/category/all" class="btn btn-ghost btn-sm">View all categories</a>
+    <a routerLink="/categories/all" class="btn btn-ghost btn-sm">View all categories</a>
   </div>
   <div class="cat-grid">
     @for (cat of categories; track cat.id) {
@@ -138,7 +138,7 @@
       <h3>Flat 55% OFF On All Products</h3>
       <p>Enjoy a flat 55% discount on all products directly from Sivakasi factory. Discount is calculated automatically on all orders. Express transport delivery available for all orders!</p>
     </div>
-    <a routerLink="/listing" class="btn btn-primary">Shop 55% OFF Now</a>
+    <a routerLink="/products" class="btn btn-primary">Shop 55% OFF Now</a>
   </div>
 </div>
 

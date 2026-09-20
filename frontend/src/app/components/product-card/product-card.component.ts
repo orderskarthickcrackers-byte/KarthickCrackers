@@ -87,7 +87,7 @@ export class ProductCardComponent {
   }
 
   navigateToDetail(): void {
-    this.router.navigate(['/detail', this.product.code]);
+    this.router.navigate(['/products', this.product.productSlug || this.product.code]);
   }
 
   onImgError(event: Event): void {
@@ -97,3 +97,4 @@ export class ProductCardComponent {
     }
   }
 }
+
