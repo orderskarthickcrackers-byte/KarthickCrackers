@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +20,9 @@ namespace KarthickCrackers.Api.Services
         private readonly ILogger<EmailService> _logger;
         private readonly ApplicationDbContext _dbContext;
 
+                private static readonly HttpClient _httpClient = new HttpClient();
+        
+
         public EmailService(IOptions<SmtpSettings> settings, ILogger<EmailService> logger, ApplicationDbContext dbContext)
         {
             _settings = settings.Value;
@@ -30,82 +34,72 @@ namespace KarthickCrackers.Api.Services
         {
             if (!_settings.Enabled)
             {
-                _logger.LogInformation("SMTP Email notification is disabled in configuration. Skipping email for Order {OrderNumber}.", order.OrderNumber);
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(_settings.AdminEmail))
-            {
-                _logger.LogWarning("AdminEmail is not configured in SmtpSettings. Skipping email for Order {OrderNumber}.", order.OrderNumber);
+                _logger.LogInformation("Email notification is disabled in configuration.");
                 return;
             }
 
             try
             {
-                var subject = $"Order Confirmation – Order #{order.OrderNumber}";
+                var subject = $"Order Confirmation - Order #{order.OrderNumber}";
                 var bodyHtml = BuildNewOrderEmailHtml(order, customer, orderItems);
 
-                using (var message = new MailMessage())
+                var toList = new List<object>();
+                
+                if (!string.IsNullOrWhiteSpace(_settings.AdminEmail))
                 {
-                    message.From = new MailAddress(_settings.SenderEmail, _settings.SenderName, Encoding.UTF8);
-                    
-                    if (!string.IsNullOrWhiteSpace(_settings.AdminEmail))
+                    toList.Add(new { email = _settings.AdminEmail.Trim(), name = "Admin" });
+                }
+
+                if (!string.IsNullOrWhiteSpace(customer.Email))
+                {
+                    var custEmail = customer.Email.Trim();
+                    if (!custEmail.Equals(_settings.AdminEmail?.Trim(), StringComparison.OrdinalIgnoreCase))
                     {
-                        message.To.Add(new MailAddress(_settings.AdminEmail.Trim()));
+                        toList.Add(new { email = custEmail, name = customer.FullName });
                     }
+                }
 
-                    if (!string.IsNullOrWhiteSpace(customer.Email))
-                    {
-                        try
-                        {
-                            var custEmail = customer.Email.Trim();
-                            if (!custEmail.Equals(_settings.AdminEmail?.Trim(), StringComparison.OrdinalIgnoreCase))
-                            {
-                                message.To.Add(new MailAddress(custEmail));
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogWarning(ex, "Failed to parse customer email address {Email}.", customer.Email);
-                        }
-                    }
+                if (toList.Count == 0) return;
 
-                    message.Subject = subject;
-                    message.Body = bodyHtml;
-                    message.IsBodyHtml = true;
-                    message.BodyEncoding = Encoding.UTF8;
-                    message.SubjectEncoding = Encoding.UTF8;
+                var payload = new
+                {
+                    sender = new { name = _settings.SenderName ?? "Karthick Crackers", email = _settings.SenderEmail },
+                    to = toList,
+                    subject = subject,
+                    htmlContent = bodyHtml,
+                    attachment = pdfBytes != null ? new[] 
+                    { 
+                        new { name = $"Order_{order.OrderNumber}.pdf", content = Convert.ToBase64String(pdfBytes) } 
+                    } : null
+                };
 
-                    // Attach PDF Invoice Document if provided
-                    if (pdfBytes != null && pdfBytes.Length > 0)
-                    {
-                        var pdfStream = new System.IO.MemoryStream(pdfBytes);
-                        var fileName = $"Karthick_Crackers_Order_{order.OrderNumber}.pdf";
-                        var attachment = new Attachment(pdfStream, fileName, "application/pdf");
-                        message.Attachments.Add(attachment);
-                    }
+                var jsonPayload = System.Text.Json.JsonSerializer.Serialize(payload, new System.Text.Json.JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
+                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                
+                var apiKey = _settings.Password;
+                
 
-                    using (var smtpClient = new SmtpClient(_settings.Host, _settings.Port))
-                    {
-                        smtpClient.EnableSsl = _settings.EnableSsl;
-                        smtpClient.UseDefaultCredentials = false;
-                        
-                        if (!string.IsNullOrEmpty(_settings.Username) && !string.IsNullOrEmpty(_settings.Password))
-                        {
-                            smtpClient.Credentials = new NetworkCredential(_settings.Username, _settings.Password);
-                        }
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.brevo.com/v3/smtp/email");
+                request.Headers.Add("api-key", apiKey);
+                request.Headers.Add("accept", "application/json");
+                request.Content = content;
 
-                        var recipientList = string.Join(", ", message.To.Select(t => t.Address));
-                        _logger.LogInformation("Sending new order email notification with PDF attachment for Order {OrderNumber} to [{Recipients}]...", order.OrderNumber, recipientList);
-                        await smtpClient.SendMailAsync(message);
-                        _logger.LogInformation("Successfully sent new order email notification for Order {OrderNumber} to [{Recipients}].", order.OrderNumber, recipientList);
-                    }
+                var response = await _httpClient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Successfully sent email via Brevo API for Order {OrderNumber}.", order.OrderNumber);
+                }
+                else
+                {
+                    _logger.LogError("Brevo API failed for Order {OrderNumber}. Status: {StatusCode}, Body: {Body}", order.OrderNumber, response.StatusCode, responseBody);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send new order email notification for Order {OrderNumber} to {AdminEmail}. Error: {Message}", order.OrderNumber, _settings.AdminEmail, ex.Message);
-                throw; // Rethrow temporarily for diagnostics
+                _logger.LogError(ex, "Failed to send email for Order {OrderNumber}", order.OrderNumber);
+                throw;
             }
         }
 
@@ -282,3 +276,5 @@ namespace KarthickCrackers.Api.Services
         }
     }
 }
+
+
