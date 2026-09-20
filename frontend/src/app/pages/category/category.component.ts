@@ -168,10 +168,9 @@ export class CategoryComponent implements OnInit {
   applyFilters(): void {
     const list = this.allProductsCache.length > 0 ? this.allProductsCache : this.productService.getProducts();
 
-    if (this.isAllSelected) {
-      this.products = list;
-    } else {
-      this.products = list.filter(p => {
+    let result = list;
+    if (!this.isAllSelected) {
+      result = list.filter(p => {
         const catIdKey = p.categoryId ? p.categoryId.toString() : '';
         const catNameKey = p.cat ? p.cat.toLowerCase().replace(/\s+/g, '') : '';
         const matchId = catIdKey ? this.selectedCategories[catIdKey] : undefined;
@@ -179,6 +178,16 @@ export class CategoryComponent implements OnInit {
         return !!(matchId || matchName);
       });
     }
+
+    if (this.sortOption === 'price-asc') {
+      result.sort((a: Product, b: Product) => a.price - b.price);
+    } else if (this.sortOption === 'price-desc') {
+      result.sort((a: Product, b: Product) => b.price - a.price);
+    } else if (this.sortOption === 'name') {
+      result.sort((a: Product, b: Product) => a.name.localeCompare(b.name));
+    }
+
+    this.products = result;
     this.cdr.detectChanges();
   }
 
@@ -222,5 +231,6 @@ export class CategoryComponent implements OnInit {
     return '🎁';
   }
 }
+
 
 
